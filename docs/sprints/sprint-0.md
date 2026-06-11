@@ -14,15 +14,16 @@ Validate ADR-003. Steps:
 2. Convert to GGUF (llama.cpp `convert_hf_to_gguf.py`); quantize Q4_K_M.
 3. Run in a minimal iOS test app via the llama.cpp Swift package on a real iPhone
    (best available + oldest team device). Record tokens/sec, peak memory, model load time.
-4. Quality bake-off: ~30 FLORES-200 sentences for Arabic, French, Portuguese, Swahili,
-   Somali, Hausa — Tiny Aya vs Google Translate, blind-judged by the team. Port the prompt
-   from `reference/backend/main.py:81-114` for this.
+4. Quality bake-off: ~30 FLORES-200 sentences for each candidate language in **PRD §3
+   (current Tier 1 + Tier 2 lists)** — Tiny Aya vs Google Translate, blind-judged by the
+   team. Port the prompt from `reference/backend/main.py:81-114` for this.
 **Acceptance:** `docs/specs/aya-spike.md` contains: license verdict, perf table per device,
 quality table per language, GO/NO-GO recommendation with the fallback plan if NO-GO.
 
 ### 0.2 — WhisperKit spike · Owner C · agent-assisted
 Minimal app: hold button → record → WhisperKit `small` transcribe + language detect, in
-airplane mode. Test clips: en, fr, ar, sw (record teammates / use Common Voice samples).
+airplane mode. Test clips: English + the PRD §3 candidate languages (record teammates /
+use Common Voice samples).
 **Acceptance:** transcripts + detected codes logged; `small` vs `base` accuracy note;
 load-time and memory figures in `docs/specs/whisper-spike.md`.
 
