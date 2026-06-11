@@ -24,15 +24,20 @@ Native Swift/SwiftUI rewrite of the award-winning
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Migration strategy, team structure, risks, App Store plan |
 | [`docs/design/UI-SPEC.md`](docs/design/UI-SPEC.md) | Exact design tokens + per-screen specs to replicate the prototype UI |
 | [`docs/sprints/`](docs/sprints/) | Sprint-by-sprint task lists with acceptance criteria |
-| [`CLAUDE.md`](CLAUDE.md) | Rules for AI coding agents working in this repo |
+| [`AGENTS.md`](AGENTS.md) | Rules for ALL AI coding agents (Codex, Claude Code, Cursor) — single source of truth |
 
 ## Working with AI agents
 
-Every implementation task should start from a sprint file. Standard prompt:
+Codex reads `AGENTS.md` automatically; Claude Code reads `CLAUDE.md`, which points to it —
+so both tools follow the same rules. Every implementation task should start from a sprint
+file. Standard prompt (works for either tool):
 
-> Read `CLAUDE.md`, `docs/PRD.md`, `docs/adr/ADRs.md`, and `docs/sprints/sprint-N.md`.
+> Read `AGENTS.md`, `docs/PRD.md`, `docs/adr/ADRs.md`, and `docs/sprints/sprint-N.md`.
 > For UI tasks also read `docs/design/UI-SPEC.md` and look at `docs/design/screenshots/`.
 > Implement task N.M. Do not add dependencies or change the engine protocols.
+
+Cloud agents (Codex web) usually can't run Xcode — they write code + tests and a human
+builds and device-tests before merge (see "Notes for sandboxed/cloud agents" in `AGENTS.md`).
 
 `reference/` contains the prototype source files we port from — **read-only**: agents may
 read them as specs but must never import, copy verbatim, or "fix" them.
