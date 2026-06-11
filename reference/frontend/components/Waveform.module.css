@@ -1,0 +1,21 @@
+.container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 32px;
+}
+
+.bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--color-recording);
+  transition: height 0.08s ease;
+}

@@ -1,0 +1,92 @@
+.view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px;
+  gap: 16px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.langBadge {
+  font-size: 22px;
+  font-weight: 700;
+  color: #5e5650;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.textRow {
+  text-align: center;
+}
+
+.text {
+  display: inline;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.playBtn {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  position: relative;
+  top: -2px;
+  background: none;
+  border: none;
+  color: #8a827d;
+  cursor: pointer;
+  padding: 0 0 0 10px;
+  transition: color 0.15s;
+}
+
+.playBtn:hover {
+  color: #888;
+}
+
+.playing {
+  color: #8a827d;
+}
+
+.playBtnWrapped {
+  padding-top: 5px;
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.12;
+  color: var(--color-text);
+}
+
+.processingOverlay {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-processing);
+  animation: dotPulse 1s ease infinite;
+}
+
+.dot:nth-child(2) { animation-delay: 0.15s; }
+.dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dotPulse {
+  0%, 60%, 100% { transform: scale(1); opacity: 0.3; }
+  30% { transform: scale(1.3); opacity: 1; }
+}

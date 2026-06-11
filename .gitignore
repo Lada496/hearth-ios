@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# SPM
+.build/
+.swiftpm/
+
+# Secrets / signing
+*.p12
+*.mobileprovision
+*.certSigningRequest
+.env
+
+# Large model files are committed via Git LFS only — raw weights otherwise ignored
+*.gguf
+*.mlmodelc/
+*.safetensors

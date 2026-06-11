@@ -1,0 +1,205 @@
+.shell {
+  max-width: 420px;
+  margin: 0 auto;
+  height: 100dvh;
+  background: var(--color-cream);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  animation: pageFadeIn 0.2s ease;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: clip;
+  position: relative;
+  background: var(--color-side-bottom);
+}
+
+.top {
+  transform: rotate(180deg);
+  background: var(--color-side-top);
+}
+
+/* ── Center divider ── */
+
+.centerDivider {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 6px 0;
+  z-index: 10;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(237, 224, 204, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Persistent tab bar ── */
+
+.persistentTab {
+  position: absolute;
+  top: 97px;
+  right: 9px;
+  z-index: 100;
+}
+
+.tabBar {
+  position: relative;
+  display: flex;
+  width: 152px;
+  background: rgba(237, 224, 204, 0.35);
+  border: 1px solid rgba(180, 150, 120, 0.18);
+  border-radius: 100px;
+  padding: 3px;
+  box-shadow: 0 2px 12px rgba(61, 50, 40, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  bottom: 3px;
+  width: calc(50% - 3px);
+  background: var(--color-warmth);
+  border-radius: 100px;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.sliderRight {
+  transform: translateX(100%);
+}
+
+.tab {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 7px 0;
+  text-align: center;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #635b56;
+  cursor: pointer;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.tabActive {
+  color: #3d2218;
+  opacity: 1;
+}
+
+/* ── Tab content transition ── */
+
+.tabsWrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.tabContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.2s ease;
+}
+
+.tabVisible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tabHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Error toast ── */
+
+.errorToast {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: #5c2020;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  animation: toastIn 0.3s ease;
+  max-width: 300px;
+  text-align: center;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ── Transcript controls (bottom-right of worker half) ── */
+
+.transcriptControls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 15;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.transcriptBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.transcriptBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.08);
+}
+
+.transcriptBtn:active {
+  transform: scale(0.95);
+}
