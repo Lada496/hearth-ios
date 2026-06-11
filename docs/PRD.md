@@ -25,7 +25,7 @@ Final list confirmed by the Sprint 0 bake-off. Candidates:
 
 | Tier | Languages | Experience |
 |---|---|---|
-| 1 — full voice loop | Arabic, French, Portuguese (+ English) | speak → translate → **spoken aloud** |
+| 1 — full voice loop | Arabic, Mandarin, Japanese (+ English) | speak → translate → **spoken aloud** |
 | 2 — voice in, text out | 2–3 of: Swahili, Somali, Hausa, Amharic | resident speaks; reply is **displayed large-type**, not spoken (iOS has no TTS voices for these) |
 
 Selection criteria: Tiny Aya quality ≥ mainstream tools on FLORES samples; Whisper STT support;
