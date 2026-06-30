@@ -28,21 +28,27 @@ low-resource languages; `base` is the fallback if memory profiling forces it (qu
 measure first).
 **Rejected.** Raw whisper.cpp (more glue, no CoreML/ANE path); Apple Speech (language coverage).
 
-## ADR-003 🔬 — Translation: one Tiny Aya model, Q4 GGUF, via llama.cpp — with a named fallback
+## ADR-003 🔬 — Translation: one Tiny-Aya Earth model, Q4 GGUF, via llama.cpp
 
 **Context.** Prototype called 4 `CohereLabs/tiny-aya-*` variants via HF cloud. On-device is
 mandatory. Unknowns (NOT resolvable from the prototype repo): parameter count, GGUF
-convertibility, on-device tokens/sec, exact license text.
-**Decision.** Ship **only `tiny-aya-global`**, 4-bit quantized GGUF, via the llama.cpp Swift
-bindings. Port the prompt + output-cleaning logic verbatim from `reference/backend/main.py:81-146`
-(the prefix-strip list encodes real model behavior). Drop the earth/fire/water picker.
-**Validation gate (Sprint 0, decide by Jul 5):** runs on a 6 GB iPhone, ≥ target latency,
-quality ≥ Google Translate on ≥3 candidate languages, license permits free-app distribution.
-**Fallback if gate fails:** Apple Translation framework (iOS 17.4+, on-device, free) for
-Tier 1 languages only. Ship date protected; low-resource differentiation lost. Both engines
+convertibility, on-device tokens/sec, exact license text. Apple Translation worked in Airplane
+Mode only after language assets were downloaded/prepared; fresh Airplane Mode without downloaded
+assets failed, so it does not satisfy the offline-from-first-launch goal as the planned v1 path.
+**Decision.** Use **only `tiny-aya-earth`** as the v1 translation engine, 4-bit quantized GGUF,
+via the llama.cpp Swift bindings. Tier 1 languages remain useful for testing/demo, but African
+language support is the model-choice driver. Port the prompt + output-cleaning logic verbatim
+from `reference/backend/main.py:81-146` (the prefix-strip list encodes real model behavior).
+Drop the earth/fire/water/global picker.
+**Validation gate (Sprint 0, decide by Jul 5):** Tiny-Aya Earth runs on a 6 GB iPhone, meets
+target latency, fits the app-size/memory budget, and license permits free-app distribution.
+Tiny-Aya Earth quality is provisionally accepted from published benchmark/model-card evidence
+until the app is usable enough for fluent-speaker TestFlight / field validation.
+**Fallback if gate fails:** Apple Translation framework (iOS 17.4+, on-device, free) for Tier
+1 languages only. Ship date protected; low-resource differentiation lost. Both engines
 implement the same `TranslationEngine` protocol, so the swap is a one-line DI change.
 **License note.** Aya models are CC-BY-NC. Hearth is free and non-commercial — compliant —
-but attribution is required in Settings → About. Verify exact Tiny Aya terms in Sprint 0.
+but attribution is required in Settings → About. Verify exact Tiny-Aya Earth terms in Sprint 0.
 
 ## ADR-004 ✅ — SwiftUI + MVVM, single app target, no architecture frameworks
 
