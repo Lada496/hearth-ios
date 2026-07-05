@@ -3,6 +3,7 @@ import UIKit
 
 struct ContentView: View {
     @StateObject private var llamaState = LlamaState()
+    @StateObject private var whisperState = WhisperState()
 
     var body: some View {
         NavigationView {
@@ -19,6 +20,7 @@ struct ContentView: View {
                     controlsSection
                     promptSection
                     resultsSection
+                    whisperSection
 
                     if !llamaState.errorMessage.isEmpty {
                         Text(llamaState.errorMessage)
@@ -104,6 +106,46 @@ struct ContentView: View {
             Text("Generated translation")
                 .font(.subheadline.bold())
             Text(llamaState.result.generatedText.isEmpty ? "No output yet." : llamaState.result.generatedText)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(8)
+                .background(.secondary.opacity(0.08))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+        }
+    }
+
+    private var whisperSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("WhisperKit STT (issue #2)")
+                .font(.headline)
+            Text(whisperState.status)
+                .font(.callout)
+
+            HStack {
+                Button("Load Whisper") {
+                    Task {
+                        await whisperState.loadWhisper()
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(whisperState.isWorking)
+
+                Button("Transcribe en") {
+                    Task {
+                        await whisperState.transcribe()
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(whisperState.isWorking)
+            }
+
+            metric("Whisper load time", whisperState.loadTime)
+            metric("STT time", whisperState.sttTime)
+            Text("Detected language: \(whisperState.detectedLanguage.isEmpty ? "not run" : whisperState.detectedLanguage)")
+
+            Text("Transcript")
+                .font(.subheadline.bold())
+            Text(whisperState.transcript.isEmpty ? "No transcript yet." : whisperState.transcript)
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(8)

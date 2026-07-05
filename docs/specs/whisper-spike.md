@@ -25,6 +25,13 @@ Validates ADR-002.
 > still valid there (Whisper alone fits, accuracy isn't RAM-bound), but **memory/latency** figures
 > are not the floor benchmark — record those on a 6 GB device.
 
+## Status log
+
+- **2026-07-04 — functional check PASSED (simulator).** iPhone 17 sim, iOS 26.5: `test_en`
+  ("I need help finding shelter tonight") transcribed exactly, detected `en`. Load 33.6 s /
+  STT 6.2 s — simulator is CPU-only CoreML; timings are NOT representative, accuracy tables
+  below must come from real devices.
+
 ## STT accuracy (`small`)
 
 | Lang | Tier | Reference text | Whisper transcript | Detected code | Match? | Notes |

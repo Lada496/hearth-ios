@@ -21,6 +21,8 @@
 		DD84C9FE2D747FED007778EC /* llama.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DD84C9FC2D747FED007778EC /* llama.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F1FE20E22B465ECA00B45541 /* LoadCustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1FE20E12B465EC900B45541 /* LoadCustomButton.swift */; };
 		FC2BFB5D2FFA23CB00EF1A23 /* WhisperState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC2BFB5C2FFA23CB00EF1A23 /* WhisperState.swift */; };
+		FC9085802FFA2843005F70F1 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = FC90857F2FFA2843005F70F1 /* WhisperKit */; };
+		FC9085822FFA2D54005F70F1 /* test_en.wav in Resources */ = {isa = PBXBuildFile; fileRef = FC9085812FFA2D54005F70F1 /* test_en.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +55,7 @@
 		DF2D2FE72B4A59BE00FCB72D /* llama.cpp */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = llama.cpp; path = ../..; sourceTree = "<group>"; };
 		F1FE20E12B465EC900B45541 /* LoadCustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadCustomButton.swift; sourceTree = "<group>"; };
 		FC2BFB5C2FFA23CB00EF1A23 /* WhisperState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperState.swift; sourceTree = "<group>"; };
+		FC9085812FFA2D54005F70F1 /* test_en.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = test_en.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FC9085802FFA2843005F70F1 /* WhisperKit in Frameworks */,
 				549479CB2AC9E16000E0F78B /* Metal.framework in Frameworks */,
 				8A39BE0A2AC7601100BFEB40 /* Accelerate.framework in Frameworks */,
 				DD84C9FD2D747FED007778EC /* llama.xcframework in Frameworks */,
@@ -115,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				8A3F84112AC4BD8C005E2EE8 /* models */,
+				FC9085812FFA2D54005F70F1 /* test_en.wav */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -172,6 +177,7 @@
 			);
 			name = TinyAyaDeviceTest;
 			packageProductDependencies = (
+				FC90857F2FFA2843005F70F1 /* WhisperKit */,
 			);
 			productName = TinyAyaDeviceTest;
 			productReference = 8A1C83732AC328BD0096AF73 /* TinyAyaDeviceTest.app */;
@@ -221,6 +227,7 @@
 			files = (
 				8A3F84242AC4C891005E2EE8 /* models in Resources */,
 				8A1C837B2AC328BE0096AF73 /* Assets.xcassets in Resources */,
+				FC9085822FFA2D54005F70F1 /* test_en.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -462,6 +469,14 @@
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FC90857F2FFA2843005F70F1 /* WhisperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FC2BFB5B2FFA225900EF1A23 /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = WhisperKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8A1C836B2AC328BD0096AF73 /* Project object */;
 }
