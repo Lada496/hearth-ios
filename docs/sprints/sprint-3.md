@@ -26,7 +26,7 @@ hands off record↔playback cleanly (with C's AudioSessionManager).
 ### 3.3 — Tier 2 large-type display · Owner B · agent-safe
 When TTS unsupported: render the translation as a prominent large-type card (UI-SPEC center
 display style, 24 pt+) with a small "text reply" badge instead of a play button.
-**Acceptance:** Swahili/Somali conversation is fully usable without audio output.
+**Acceptance:** Swahili conversation is fully usable without audio output.
 
 ### 3.4 — End-to-end wiring + session lifecycle · Owner A · agent-safe
 Replace last mocks. End-session wipe; >5 min background wipe (ADR-006); auto-set session
