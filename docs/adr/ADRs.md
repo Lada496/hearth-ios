@@ -19,7 +19,7 @@ memory ceiling (~3 GB on 6 GB-RAM devices).
 ## ADR-002 ✅ — STT: WhisperKit with multilingual `small` model
 
 **Context.** Prototype used server-side `openai-whisper` `small` (`main.py:50`) for transcript
-+ language detection. Tier 2 languages (Swahili, Somali, Amharic, Hausa) need STT; Apple's
++ language detection. Tier 2 languages (Swahili, Amharic, Hausa) need STT; Apple's
 `SFSpeechRecognizer` / iOS 26 `SpeechAnalyzer` don't support them.
 **Decision.** [WhisperKit](https://github.com/argmaxinc/WhisperKit) (MIT), CoreML, `small`
 multilingual (~500 MB), bundled. Language detection replaces the `/process` endpoint.
