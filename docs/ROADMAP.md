@@ -101,7 +101,27 @@ describe the expected integration order, not a reason to leave an unblocked huma
 
 ## 8. After August
 
-Humans choose target languages using shelter relevance, model support, Whisper results, TTS
-availability, and fluent-speaker evaluation. Only then should the team add a public supported-
-language catalog, manual language sheet, fine-tuning plan, quality thresholds, external beta,
-App Store assets, and a release date.
+The complete post-August path is:
+
+| Phase | Human gate | Outcome |
+|---|---|---|
+| Language decision | Shelter need, model/STT evidence, TTS availability, evaluators, maintenance cost | Approved language directions to investigate |
+| Evaluation foundation | Licensed data, protected test set, error taxonomy, acceptance thresholds | Reproducible unchanged-model baseline |
+| Model enrichment | Evidence selects prompt/glossary work first and adapter tuning only when justified | Documented candidate or a stop decision |
+| Candidate qualification | Physical-iPhone regression and blinded fluent-speaker review both pass | Approved language direction and rollback artifact |
+| Productization | Manual override, capability-driven TTS/text fallback, claims, attribution, accessibility | External-beta candidate |
+| Release decision | Privacy/offline regression, beta evidence, App Store scope, human approval | Scheduled public release or another revision cycle |
+
+Humans choose target languages using shelter relevance, Tiny-Aya and Whisper results, TTS
+availability, fluent-evaluator access, and the cost of sustaining quality. Language detection is
+runtime routing evidence, not proof that a language is safe to support.
+
+The dependency-ordered [`backlog/model-enrichment.md`](backlog/model-enrichment.md) starts only
+after that decision. It defines data governance, a protected evaluation suite, baseline testing,
+the prompt-to-adapter intervention ladder, packaging, device gates, fluent review, and promotion.
+Each language direction can be accepted, revised, or stopped independently. Fine-tuning is an
+option supported by evidence, not an automatic next step.
+
+Only candidates that pass both device and fluent-speaker gates move into the public supported-
+language catalog, manual language sheet, external beta, and release planning. Public release
+remains unscheduled until those gates produce enough evidence for a human decision.

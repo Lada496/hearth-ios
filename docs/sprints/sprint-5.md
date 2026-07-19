@@ -21,12 +21,14 @@ motion, and screenshots. A human completes the device/VoiceOver pass.
 Run build/tests, networking scan, airplane-mode typed/voice smoke test, interruption test, and a
 ten-minute memory run on a supported iPhone. Record translation outputs without scoring accuracy.
 
-### 5.5 — Post-August decision list · Owner all · human-only · [#37](https://github.com/Lada496/hearth-ios/issues/37)
-Record evidence needed for target languages, fluent-speaker validation, fine-tuning, external
-beta, App Store work, and release timing. Do not begin those workstreams in this sprint.
+### 5.5 — Model-enrichment backlog handoff · Owner all · human-only · [#37](https://github.com/Lada496/hearth-ios/issues/37)
+Confirm the entry evidence for [`../backlog/model-enrichment.md`](../backlog/model-enrichment.md):
+target-language decision inputs, evaluator access, data/license ownership, named test devices,
+and release ownership. Do not select languages or begin enrichment work in this sprint.
 
 ## Exit criteria
 
 - Internal August build installs and runs offline on a supported iPhone.
 - Core typed/voice flows and privacy wipes pass.
-- Deferred language and release decisions are explicit and cannot be mistaken for completed work.
+- Deferred language, enrichment, and release work has a gated owner and dependency order and
+  cannot be mistaken for completed work.
