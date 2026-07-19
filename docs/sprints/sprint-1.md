@@ -1,68 +1,42 @@
-# Sprint 1 — Foundation (Jun 29–Jul 12)
+# Sprint 1 — Guardrails and Foundation (Jul 19–26)
 
-**Goal:** a demo where you hold a mic button, "speak", and a **mock** translated message
-appears in the rotated dual-pane UI. Everything real comes later; the architecture and the
-look land now.
-
-Read first: `../PRD.md`, `../adr/ADRs.md`, `../design/UI-SPEC.md`, `CLAUDE.md`.
+**Goal:** create stable, language-neutral seams so UI and engine work can proceed safely in
+parallel. Read `../PRD.md`, `../ROADMAP.md`, `../adr/ADRs.md`, and `../../AGENTS.md` first.
 
 ## Tasks
 
-### 1.1 — Domain model · Owner A · agent-safe
-Port `reference/frontend/types.ts` to `Hearth/Domain/`:
-- `Message` (id, speaker, originalText, translatedText, sourceLanguage, targetLanguage, timestamp)
-- `Speaker` enum (`.resident` / `.worker` — replaces top/bottom)
-- `Language` (code, name, flag, tier) — seed data from
-  `reference/frontend/lib/hearth-translation-service.ts:20-42` + `SupportPanel.tsx:17-40`,
-  filtered to launch languages
-- `SessionPhase` enum mirroring `RecordingState`: `.idle`, `.recording(Speaker)`,
-  `.transcribing(Speaker)`, `.translating(Speaker)`
-**Acceptance:** compiles, unit tests for Language seed-data integrity (codes unique, tiers set).
+### 1.1 — Finish repository guardrails · Owner D · agent-safe · [#4](https://github.com/Lada496/hearth-ios/issues/4)
+Keep the existing Xcode scaffold. Add build/test CI, SwiftLint, the networking-API ban, and
+documented branch protection. Do not touch signing or model resources.
 
-### 1.2 — Engine protocols + mocks 🔴 blocks everything · Owner A · agent-safe, all review
-`Hearth/Engines/`: async throwing protocols —
-```swift
-protocol SpeechToText  { func transcribe(_ audio: AudioBuffer) async throws -> (text: String, language: Language?, confidence: Double) ; func prepare() async throws }
-protocol TranslationEngine { func translate(_ text: String, from: Language, to: Language) async throws -> String ; func prepare() async throws }
-protocol TextToSpeech  { func speak(_ text: String, language: Language) async throws ; var supports: (Language) -> Bool { get } }
-```
-(Refine signatures in the PR — then FROZEN per ADR rules.) `MockSTT`, `MockTranslator`,
-`MockTTS` with configurable delay + failure injection.
-**Acceptance:** ViewModels can be built and tested without any model file present.
+### 1.2 — Language-neutral domain model · Owner A · agent-safe · [#7](https://github.com/Lada496/hearth-ios/issues/7)
+Add `Message`, `Speaker`, `Language`, and `SessionPhase`. `Language` stores normalized code,
+display name, and optional flag but no launch tier. Seed data exists only as preview/test
+fixtures and must be named accordingly.
 
-### 1.3 — ConversationViewModel · Owner B with A · agent-safe
-Port the state machine from `reference/frontend/hooks.ts` (`useConversation`, lines 35–254).
-Preserve every guard: no start while non-idle, stop ignored on speaker mismatch, empty
-transcript no-op, per-step error → user-readable message + reset to idle. Add: session
-resident-language state (port the singleton logic from
-`reference/frontend/lib/hearth-translation-service.ts:120-145` INTO the ViewModel — no globals).
-**Acceptance:** ≥10 unit tests against mocks covering the guards and the happy path both directions.
+### 1.3 — Freeze engine protocols and mocks · Owner A · agent-safe, two-human review · [#8](https://github.com/Lada496/hearth-ios/issues/8)
+Define async `SpeechToText`, `TranslationEngine`, and `TextToSpeech` contracts plus configurable
+mocks. Protocols accept runtime language metadata and contain no fixed language list.
 
-### 1.4 — DesignSystem · Owner B · agent-safe
-`Hearth/DesignSystem/`: all §1–§2 tokens from UI-SPEC as `Color`/`Font` extensions; bundle
-Nunito + Playfair Display TTFs (OFL).
-**Acceptance:** a swatch debug view rendering every token, screenshot in PR.
+### 1.4 — Design system · Owner B · agent-safe · [#10](https://github.com/Lada496/hearth-ios/issues/10)
+Implement all UI-SPEC color and font tokens, bundle approved fonts, and provide a debug swatch
+preview. Views must not hard-code spec values.
 
-### 1.5 — ConversationView skeleton · Owner B · agent-safe (screenshot-reviewed)
-Per UI-SPEC §4: rotated top pane, divider, bottom pane, MicButton (§4a) with full
-recording/pulse animation, message bubbles (§4b), processing dots (§4c). Wired to the
-ViewModel with mock engines.
-**Acceptance:** side-by-side vs `screenshots/translation.png` review passes (§7); both mic
-buttons drive mock messages; disabled states correct.
+### 1.5 — App shell and landing · Owner B · agent-safe · [#18](https://github.com/Lada496/hearth-ios/issues/18)
+Implement routing and the landing screen against the design tokens and screenshot. Do not add
+conversation behavior or device checks in this ticket.
 
-### 1.6 — Landing + app shell · Owner B · agent-safe
-LandingView per UI-SPEC §3; `HearthApp` + router (landing → conversation); launch-time
-device RAM check with friendly unsupported-device screen (ADR-005).
-**Acceptance:** matches `screenshots/landing.png`; fade transition.
+### 1.6 — Device capability gate · Owner B/D · agent-safe, human device check · [#24](https://github.com/Lada496/hearth-ios/issues/24)
+Show a friendly unsupported-device screen before model preparation on devices below the ADR-005
+memory floor. Do not change deployment target, signing, or entitlements.
 
-### 1.7 — AudioSessionManager · Owner C · **human-owned**
-`AVAudioSession` + `AVAudioEngine`: hold-to-record producing 16 kHz mono PCM buffers;
-category switching record↔playback; phone-call interruption ends recording cleanly;
-mic-permission flow with Settings deep-link on denial.
-**Acceptance:** device-tested (note in PR): record → buffer count sane; interruption test
-performed; permission-denied path screenshotted.
+### 1.7 — Supporting-screen and error-copy spec · Owner B/Product · agent-safe, human review · [#23](https://github.com/Lada496/hearth-ios/issues/23)
+Specify unsupported-device, model-loading/failure, onboarding, settings, and shared recoverable
+error states before agents implement screens not already covered by the UI spec.
 
 ## Exit criteria
-- [ ] Mock-powered conversation demo on a physical device, both directions
-- [ ] UI passes screenshot comparison
-- [ ] CI green; all merges via reviewed PRs
+
+- CI guardrails are active.
+- Protocols and mocks build without model files.
+- Landing screen is reachable and screenshot-reviewed.
+- No production code claims a final language list.
