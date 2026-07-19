@@ -4,7 +4,7 @@ This plan starts **after** the August internal build and **after** humans approv
 language directions. It turns the provisional Tiny-Aya Earth translator into an evidence-backed
 candidate for each approved language without weakening Hearth's offline or privacy guarantees.
 
-This is a dependency-ordered backlog, not a dated release commitment. Repeat ME-1 through ME-9
+This is a dependency-ordered backlog, not a dated release commitment. Repeat ME-0 through ME-10
 for each language direction or closely related group. A result for one language must not be used
 to claim support for another. GitHub parent issue
 [#37](https://github.com/Lada496/hearth-ios/issues/37) tracks the full sequence.
