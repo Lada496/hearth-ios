@@ -58,11 +58,17 @@ future manual override still require a normalized language code.
 ## 5. Deferred until after the August build
 
 - Final target languages and any marketed supported-language list
-- Translation-quality acceptance, model fine-tuning, and comparative bake-offs
+- Translation-quality acceptance and the dependency-ordered model evaluation/enrichment work in
+  [`backlog/model-enrichment.md`](backlog/model-enrichment.md)
 - Language-specific TTS tiers and the manual language sheet
 - App Store submission, external TestFlight, listing assets, and release date
 - Transcript history, support prompts, harmful-language detection, accounts, analytics,
   notifications, and all networking
+
+After humans choose languages and evaluators, the team establishes a protected evaluation set,
+licensed data manifest, and unchanged-model baseline. It tries prompt/decoding/glossary changes
+before authorizing adapter training, then packages and tests a candidate on physical iPhones.
+Fluent-speaker review and on-device reliability must both pass before a language is marketed.
 
 ## 6. Non-functional requirements
 
