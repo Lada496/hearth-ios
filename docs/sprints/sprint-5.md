@@ -10,8 +10,7 @@ Add at most three icon-led pages for hold-to-talk, pass-the-phone, and offline p
 the onboarding-seen flag.
 
 ### 5.2 — Settings and attribution · Owner B/D · agent-safe · [#30](https://github.com/Lada496/hearth-ios/issues/30)
-Add privacy, model/library/font attributions, and device information. Do not show a supported-
-language list or tier badges before the language decision.
+Add privacy, model/library/font attributions, and device information. Do not show a supported language list or tier badges before the language decision.
 
 ### 5.3 — Accessibility and visual regression · Owner B · agent-assisted · [#35](https://github.com/Lada496/hearth-ios/issues/35)
 Audit VoiceOver on both orientations, worker-side Dynamic Type, contrast, touch targets, reduced
