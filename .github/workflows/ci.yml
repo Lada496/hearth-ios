@@ -17,7 +17,7 @@ concurrency:
 env:
   PROJECT: Hearth/Hearth.xcodeproj
   SCHEME: Hearth
-  DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
+  TEST_DESTINATION: platform=iOS Simulator,name=Hearth CI,OS=26.5
   DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
 jobs:
@@ -41,6 +41,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
       - name: Lint Swift source
         run: swiftlint lint --strict --config .swiftlint.yml
 
@@ -49,7 +52,7 @@ jobs:
           xcodebuild
           -project "$PROJECT"
           -scheme "$SCHEME"
-          -destination "$DESTINATION"
+          -destination "generic/platform=iOS Simulator"
           -derivedDataPath "$RUNNER_TEMP/HearthBuild"
           CODE_SIGNING_ALLOWED=NO
           build
@@ -61,12 +64,21 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install iOS simulator runtime
+        run: xcodebuild -downloadPlatform iOS -buildVersion 26.5
+
+      - name: Create iOS simulator
+        run: >-
+          xcrun simctl create "Hearth CI"
+          com.apple.CoreSimulator.SimDeviceType.iPhone-17
+          com.apple.CoreSimulator.SimRuntime.iOS-26-5
+
       - name: Run model-free unit tests
         run: >-
           xcodebuild
           -project "$PROJECT"
           -scheme "$SCHEME"
-          -destination "$DESTINATION"
+          -destination "$TEST_DESTINATION"
           -derivedDataPath "$RUNNER_TEMP/HearthTests"
           -only-testing:HearthTests
           CODE_SIGNING_ALLOWED=NO
