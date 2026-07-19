@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROJECT: Hearth/Hearth.xcodeproj
+  SCHEME: Hearth
+  DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
+  DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+
+jobs:
+  guardrails:
+    name: Guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify networking ban detects violations
+        run: Scripts/test-check-no-networking.sh
+
+      - name: Scan product source for networking APIs
+        run: Scripts/check-no-networking.sh
+
+  build:
+    name: Build
+    runs-on: macos-26
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Lint Swift source
+        run: swiftlint lint --strict --config .swiftlint.yml
+
+      - name: Build app
+        run: >-
+          xcodebuild
+          -project "$PROJECT"
+          -scheme "$SCHEME"
+          -destination "$DESTINATION"
+          -derivedDataPath "$RUNNER_TEMP/HearthBuild"
+          CODE_SIGNING_ALLOWED=NO
+          build
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: macos-26
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run model-free unit tests
+        run: >-
+          xcodebuild
+          -project "$PROJECT"
+          -scheme "$SCHEME"
+          -destination "$DESTINATION"
+          -derivedDataPath "$RUNNER_TEMP/HearthTests"
+          -only-testing:HearthTests
+          CODE_SIGNING_ALLOWED=NO
+          test
