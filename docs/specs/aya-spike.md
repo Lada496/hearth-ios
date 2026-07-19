@@ -2,6 +2,9 @@
 
 Status: provisional implementation decision. Human validation still required.
 
+Planning note (2026-07-19): tier and candidate-language references below record the original
+spike context. The current August plan defers final language selection; see `../PRD.md`.
+
 Issue: https://github.com/Lada496/hearth-ios/issues/1
 
 Sprint task: `docs/sprints/sprint-0.md` task 0.1
