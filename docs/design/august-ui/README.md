@@ -30,6 +30,7 @@ supported-language promise or a launch-language decision.
 
 | Issue | Use these files |
 | --- | --- |
+| [#9 Conversation ViewModel](https://github.com/Lada496/hearth-ios/issues/9) | `flow-02-conversation-turn.png`, `flow-03-recovery-privacy.png` |
 | [#10 Design system](https://github.com/Lada496/hearth-ios/issues/10) | `catalog-all-ui.png` |
 | [#13 Audio session](https://github.com/Lada496/hearth-ios/issues/13) | `prototype-03-recording.png`, `gap-08-microphone-permission.png` |
 | [#18 App shell and landing](https://github.com/Lada496/hearth-ios/issues/18) | `prototype-01-landing.png`, `flow-01-first-launch.png` |
