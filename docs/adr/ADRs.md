@@ -43,7 +43,7 @@ output-cleaning logic from `reference/backend/main.py:81-146` (the prefix-strip 
 real model behavior).
 Drop the earth/fire/water/global picker.
 **August integration gate:** Tiny-Aya Earth runs on a supported iPhone, stays responsive, and
-fits the app-size/memory budget. The license was accepted for Hearth's free non-commercial use.
+fits the app-size/memory budget. The license must permit Hearth's free non-commercial use.
 Translation accuracy is explicitly not an August gate and remains unvalidated until the team
 chooses target languages and recruits fluent speakers.
 **Fallback if gate fails:** Apple Translation framework (iOS 17.4+, on-device, free) for
