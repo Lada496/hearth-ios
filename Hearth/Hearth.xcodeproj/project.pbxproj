@@ -29,9 +29,32 @@
 		315D29A72FF0F17F00C0C0A2 /* HearthUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HearthUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C0D3C10A2FF0F17D00C0C0A2 /* Exceptions for "Hearth" folder in "Hearth" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Audio/.gitkeep,
+				DesignSystem/.gitkeep,
+				Domain/.gitkeep,
+				Engines/Safety/.gitkeep,
+				Engines/SpeechToText/.gitkeep,
+				Engines/TextToSpeech/.gitkeep,
+				Engines/Translation/.gitkeep,
+				Features/Conversation/.gitkeep,
+				Features/Landing/.gitkeep,
+				Features/Onboarding/.gitkeep,
+				Features/Settings/.gitkeep,
+			);
+			target = 315D298F2FF0F17D00C0C0A2 /* Hearth */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		315D29922FF0F17D00C0C0A2 /* Hearth */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C0D3C10A2FF0F17D00C0C0A2 /* Exceptions for "Hearth" folder in "Hearth" target */,
+			);
 			path = Hearth;
 			sourceTree = "<group>";
 		};
