@@ -1,77 +1,88 @@
-# Hearth iOS — Product Requirements Document (v1 MVP)
+# Hearth iOS — Product Requirements Document (August Build)
 
-**Status:** Approved 2026-06-10 · **Ship target:** App Store, end of August 2026
+**Status:** Rebaselined 2026-07-19 · **Build target:** installable internal build by
+2026-08-31 · **Public release date:** TBD
 
 ## 1. Product
 
-Hearth is a privacy-first, **fully offline** voice translation app that lets a shelter worker
-and a resident who share no common language hold a real two-way conversation on one iPhone,
-passed or laid flat between them. No accounts. No data collection. No network — ever.
+Hearth is a privacy-first, fully offline voice translation app for a shelter worker and a
+resident using one iPhone face to face. No accounts, data collection, persistence of
+conversation content, or network access.
 
-Built with and for The Bloom Group (low-barrier women's shelter, Vancouver). Differentiator:
-on-device Tiny Aya (Cohere) translation tuned for low-resource languages that mainstream
-tools handle poorly.
+The August build proves the complete product shape and on-device integration. It uses the
+standard Tiny-Aya Earth Q4 model as a provisional translator. The team is not fine-tuning the
+model or claiming that its translations are accurate enough for any launch language yet.
 
 ## 2. Users
 
 | Persona | Side of screen | Assumptions |
 |---|---|---|
-| **Worker** (shelter staff) | Bottom (normal orientation) | Speaks English, owns the phone, medium digital literacy |
-| **Resident** | Top (rotated 180°) | Any supported language; low digital literacy; possibly in crisis; must need zero instruction |
+| Worker | Bottom, normal orientation | Speaks English and owns the phone |
+| Resident | Top, rotated 180° | Language is detected from speech; must need little instruction |
 
-## 3. Language support (tiered)
+## 3. Language behavior during development
 
-Final list confirmed by the Sprint 0 bake-off. Candidates:
+The final launch-language list is deliberately deferred and does not block implementation.
 
-| Tier | Languages | Experience |
-|---|---|---|
-| 1 — full voice loop | Arabic, Mandarin, Japanese (+ English) | speak → translate → **spoken aloud** |
-| 2 — voice in, text out | 2–3 of: Swahili, Somali, Hausa, Amharic | resident speaks; reply is **displayed large-type**, not spoken (iOS has no TTS voices for these) |
+- English is the worker language for the August build.
+- WhisperKit returns a resident-language code with each transcription. The session stores that
+  code and passes it to the translator; views must not contain language-specific branches.
+- Tiny-Aya Earth translates between English and the detected resident language when it can.
+- `AVSpeechSynthesizer` speaks a translation only when iOS exposes a matching voice. Otherwise
+  the same translation is shown in large type. No permanent Tier 1/Tier 2 table is encoded yet.
+- Languages used in previews, mocks, unit tests, and smoke tests are test fixtures only. They
+  are not launch commitments or evidence of translation quality.
+- Before the voice pipeline is integrated, debug/test composition may inject one resident-
+  language fixture to exercise typed translation. The production UI must not present that
+  fixture as a supported-language choice.
+- A public supported-language list, manual language picker, model tuning, fluent-speaker
+  validation, and language-specific quality thresholds wait for the target-language decision.
 
-Selection criteria: Tiny Aya quality ≥ mainstream tools on FLORES samples; Whisper STT support;
-relevance to shelter populations.
+Language detection removes the final list from the main UI and data-flow dependency, but it
+does not remove language metadata: translation direction, TTS voice lookup, diagnostics, and a
+future manual override still require a normalized language code.
 
-## 4. v1 user stories (in scope)
+## 4. August build scope
 
-1. **Dual-pane conversation.** Top half rotated 180° for the resident, bottom for the worker —
-   replicating the prototype (`docs/design/screenshots/translation.png`).
-2. **Resident speaks:** hold top mic → on-device Whisper transcribes + detects language →
-   Tiny Aya translates to English → both panes update.
-3. **Worker responds:** hold bottom mic or type → English translated to the resident's session
-   language → Tier 1: auto-spoken via TTS; Tier 2: large-type display.
-4. **Tap any bubble to replay** its audio (Tier 1) .
-5. **Manual language fallback:** if detection confidence is low or wrong, worker opens a
-   language sheet (flag + name list) and sets the resident's language for the session.
-6. **End session:** one button wipes the conversation from memory. Backgrounding >5 min also wipes.
-7. **Onboarding:** ≤3 icon-driven screens (hold-to-talk, pass the phone, privacy promise),
-   shown once.
-8. **Settings:** About, open-source/model attributions (Aya CC-BY-NC, WhisperKit), privacy
-   statement, supported-language list with tier badges.
+1. Landing screen and app shell matching `docs/design/UI-SPEC.md`.
+2. Dual-pane conversation screen with the resident pane rotated 180°.
+3. Typed turns through injected mock engines, then Tiny-Aya Earth locally. A worker reply
+   requires resident-language metadata from prior detection; debug builds may inject a fixture.
+4. Hold-to-record voice input through `AudioSessionManager` and WhisperKit language detection.
+5. Runtime output choice: system TTS when a matching voice exists, large text otherwise.
+6. Loading, processing, empty-input, permission, and recoverable-error states.
+7. Tap-to-replay when speech is available.
+8. End-session and five-minute-background wipes of all conversation content.
+9. Short onboarding, privacy/about/settings content, and the required accessibility pass.
 
-## 5. Explicitly OUT of scope for v1
+## 5. Deferred until after the August build
 
-- Transcript save/history (prototype's `transcriptStore` feature) — cut
-- Support prompt library — cut (stretch for v2)
-- Harmful-language detection — cut; *optional stretch:* silently skip translation on keyword
-  hit (port of `reference/backend/aggression.py`), with **no alert, no SMS, no blocking message**
-- Region/model picker (Auto/Earth/Fire/Water) — ship ONE Tiny Aya model
-- Accounts, analytics, crash SDKs, notifications, any network feature
+- Final target languages and any marketed supported-language list
+- Translation-quality acceptance, model fine-tuning, and comparative bake-offs
+- Language-specific TTS tiers and the manual language sheet
+- App Store submission, external TestFlight, listing assets, and release date
+- Transcript history, support prompts, harmful-language detection, accounts, analytics,
+  notifications, and all networking
 
 ## 6. Non-functional requirements
 
-| Requirement | Target |
+| Requirement | August target |
 |---|---|
-| Offline | 100% of functionality in airplane mode, from first launch |
-| Privacy label | "Data Not Collected" — enforced by CI ban on networking APIs |
-| Latency (release mic → translation visible, 10 s utterance) | ≤ 8 s on iPhone 15 Pro · ≤ 15 s on minimum device |
-| App size | ≤ 3.5 GB (App Store limit 4 GB); models bundled |
-| Devices | iOS 17.0+, ≥6 GB RAM: iPhone 12 Pro/Pro Max, 13 Pro/Pro Max, 14 and all newer. 4 GB devices (11, 12, 12 mini, 13, 13 mini, SE) unsupported — graceful explanation screen, no crash |
-| Memory | No jetsam kill during a 10-minute conversation on a 6 GB device |
-| Accessibility | VoiceOver labels everywhere; Dynamic Type on worker pane; WCAG AA contrast (prototype already achieves AAA — keep it); ≥44 pt touch targets |
-| Cost | $0 recurring beyond the $99/yr Apple Developer Program |
+| Offline | All runtime features work in airplane mode from first launch |
+| Privacy | Data Not Collected; CI rejects networking APIs; content remains in memory only |
+| Translation | Tiny-Aya Earth runs locally; accuracy is observed but is not an August gate |
+| Performance | Record load time and end-to-end latency; no UI watchdog stall |
+| App size | At most 3.5 GB with human-managed bundled model artifacts |
+| Devices | iOS 17+, at least 6 GB RAM; unsupported devices receive an explanation, not a crash |
+| Memory | No crash or jetsam during a ten-minute smoke conversation on a supported device |
+| Accessibility | VoiceOver labels, worker-side Dynamic Type, AA contrast, 44 pt targets |
 
-## 7. Success criteria (presentation, end of August)
+## 7. August success criteria
 
-- App is live on the public App Store.
-- A first-time user pair completes a 5-turn conversation with zero verbal instruction.
-- Demo runs in airplane mode on stage.
+- A clean build and unit-test run succeeds without model files present.
+- A supported physical iPhone runs a five-turn typed and voice smoke conversation in airplane
+  mode using locally bundled engines.
+- The landing and conversation screens pass comparison against the approved screenshots.
+- Ending or timing out a session leaves no conversation content behind.
+- Known translation mistakes are recorded as validation evidence, not silently converted into
+  launch-language claims.

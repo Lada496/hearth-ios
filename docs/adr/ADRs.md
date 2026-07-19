@@ -19,8 +19,9 @@ memory ceiling (~3 GB on 6 GB-RAM devices).
 ## ADR-002 ✅ — STT: WhisperKit with multilingual `small` model
 
 **Context.** Prototype used server-side `openai-whisper` `small` (`main.py:50`) for transcript
-+ language detection. Tier 2 languages (Swahili, Somali, Amharic, Hausa) need STT; Apple's
-`SFSpeechRecognizer` / iOS 26 `SpeechAnalyzer` don't support them.
+and language detection. Hearth needs broad multilingual coverage even though the final launch-
+language list is deferred; Apple's `SFSpeechRecognizer` / iOS 26 `SpeechAnalyzer` do not cover
+several languages under consideration.
 **Decision.** [WhisperKit](https://github.com/argmaxinc/WhisperKit) (MIT), CoreML, `small`
 multilingual (~500 MB), bundled. Language detection replaces the `/process` endpoint.
 **Consequences.** ANE-accelerated, maintained Swift API. `small` is the accuracy floor for
@@ -35,20 +36,21 @@ mandatory. Unknowns (NOT resolvable from the prototype repo): parameter count, G
 convertibility, on-device tokens/sec, exact license text. Apple Translation worked in Airplane
 Mode only after language assets were downloaded/prepared; fresh Airplane Mode without downloaded
 assets failed, so it does not satisfy the offline-from-first-launch goal as the planned v1 path.
-**Decision.** Use **only `tiny-aya-earth`** as the v1 translation engine, 4-bit quantized GGUF,
-via the llama.cpp Swift bindings. Tier 1 languages remain useful for testing/demo, but African
-language support is the model-choice driver. Port the prompt + output-cleaning logic verbatim
-from `reference/backend/main.py:81-146` (the prefix-strip list encodes real model behavior).
+**Decision.** Use **only `tiny-aya-earth`** as the provisional translation engine, 4-bit
+quantized GGUF, via the llama.cpp Swift bindings. Development fixtures are useful for integration,
+but final language support is not an engine-implementation prerequisite. Port the prompt and
+output-cleaning logic from `reference/backend/main.py:81-146` (the prefix-strip list encodes
+real model behavior).
 Drop the earth/fire/water/global picker.
-**Validation gate (Sprint 0, decide by Jul 5):** Tiny-Aya Earth runs on a 6 GB iPhone, meets
-target latency, fits the app-size/memory budget, and license permits free-app distribution.
-Tiny-Aya Earth quality is provisionally accepted from published benchmark/model-card evidence
-until the app is usable enough for fluent-speaker TestFlight / field validation.
-**Fallback if gate fails:** Apple Translation framework (iOS 17.4+, on-device, free) for Tier
-1 languages only. Ship date protected; low-resource differentiation lost. Both engines
+**August integration gate:** Tiny-Aya Earth runs on a supported iPhone, stays responsive, and
+fits the app-size/memory budget. The license was accepted for Hearth's free non-commercial use.
+Translation accuracy is explicitly not an August gate and remains unvalidated until the team
+chooses target languages and recruits fluent speakers.
+**Fallback if gate fails:** Apple Translation framework (iOS 17.4+, on-device, free) for
+languages with prepared Apple assets only. Low-resource differentiation would be lost. Both engines
 implement the same `TranslationEngine` protocol, so the swap is a one-line DI change.
 **License note.** Aya models are CC-BY-NC. Hearth is free and non-commercial — compliant —
-but attribution is required in Settings → About. Verify exact Tiny-Aya Earth terms in Sprint 0.
+but attribution is required in Settings → About.
 
 ## ADR-004 ✅ — SwiftUI + MVVM, single app target, no architecture frameworks
 

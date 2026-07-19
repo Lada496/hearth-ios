@@ -5,6 +5,10 @@ below was extracted from the prototype's actual CSS (paths given), not approxima
 doubt, the screenshots in `screenshots/` are the final arbiter — especially `translation.png`
 (conversation screen) and `landing.png`.
 
+**August 2026 scope note:** the final language list and permanent tier badges are deferred.
+Where this historical visual spec says Tier 1/Tier 2, implement the equivalent runtime state:
+speech available or text only. The manual language sheet in §4e is post-August work.
+
 Implement all tokens in `Hearth/DesignSystem/` (e.g. `Color+Hearth.swift`,
 `Font+Hearth.swift`). **Views must never hard-code these values.**
 
@@ -119,8 +123,8 @@ The signature screen. Vertical layout, full height:
 - Contents: language row (flag badge 14 pt bold, 70% opacity) → original text (12 pt italic)
   → translation (15 pt bold). Colors per token table §1.
 - Play button: 28×28 circle inside the bubble's lower corner (left for "me", right for
-  "other"), 10–12% black-tone bg, press scales 0.9. Tier 2 languages: replace with a small
-  "text only" label.
+  "other"), 10–12% black-tone bg, press scales 0.9. When runtime TTS support is unavailable,
+  replace it with a small "text only" label.
 - Entry animation: fade + 6 pt upward slide, 0.3 s ease.
 
 ### 4c. Processing indicator  (`ConversationThread.module.css`)
@@ -139,11 +143,16 @@ staggered 0 / 0.15 / 0.3 s. Centered in the pane while transcribing/translating.
 - TextField 13 pt, placeholder `placeholder` color, grows 1→~5 lines (max-height 96).
 - Send: 26×26 warmth circle, `textOnWarmth` arrow, disabled at 30% opacity.
 
-### 4e. Language sheet (v1 replacement for SupportPanel's picker)
+### 4e. Language sheet (deferred until target languages are selected)
 
-Source list: `reference/frontend/components/SupportPanel.tsx:17-40` — filter to launch
-languages, add Tier badges. Rows: flag emoji + name, Nunito 600, cream surface, warmth
-highlight on selection. Present as a standard `.sheet` from the center divider.
+After the target-language decision, use
+`reference/frontend/components/SupportPanel.tsx:17-40` as a visual/data reference, filter it
+to the approved catalog, and add the approved capability labels. Rows: flag emoji + name,
+Nunito 600, cream surface, warmth highlight on selection. Present as a standard `.sheet` from
+the center divider.
+
+Do not implement this for the August build. Until the final catalog exists, the divider may
+display detected session-language metadata but must not advertise a supported-language list.
 
 ## 5. Motion summary
 
@@ -165,8 +174,9 @@ highlight on selection. Present as a standard `.sheet` from the center divider.
   `sand.opacity(...)`; match against screenshots, not exact CSS alpha.
 - `100dvh` → SwiftUI handles this natively; respect safe areas; keyboard avoidance only on
   the bottom (worker) input — the top input needs custom handling since it's rotated.
-- Flag emoji render natively; the `Language` domain type carries `flag: String` exactly as
-  the prototype's `LANGUAGE_FLAGS` map (`reference/frontend/lib/hearth-translation-service.ts:20-42`).
+- Flag emoji render natively. Preview/test fixtures may borrow the prototype's
+  `LANGUAGE_FLAGS` map, but production views must accept runtime language metadata rather than
+  reading a fixed catalog.
 - Radius-100 pills → `Capsule()`.
 - Verify colors on-device: prototype colors are sRGB; use `Color(red:green:blue:)` from hex
   in sRGB space.
