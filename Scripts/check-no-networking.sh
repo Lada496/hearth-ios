@@ -12,7 +12,12 @@ if [[ ! -d "$source_root" ]]; then
   exit 2
 fi
 
-if grep -RInE --include='*.swift' "$forbidden_pattern" "$source_root"; then
+swift_violations="$(
+  find "$source_root" -type f -name '*.swift' \
+    -exec grep -nHE "$forbidden_pattern" {} + || true
+)"
+if [[ -n "$swift_violations" ]]; then
+  printf '%s\n' "$swift_violations"
   found_violation=1
 fi
 
