@@ -75,11 +75,55 @@ Before closing issue #1, humans still need to confirm:
 | License is acceptable for Hearth's free, non-commercial App Store distribution | PASS — human confirmed CC-BY-NC 4.0/AUP is acceptable for Hearth's free, non-commercial app with attribution |
 | Tiny-Aya Earth can be converted to GGUF and quantized to Q4_K_M | PASS — Cohere provides official public GGUF artifacts, including Q4_K_M, in `CohereLabs/tiny-aya-earth-GGUF`; local BF16 conversion was not run because the source model files are gated |
 | Quantized model size fits the app budget | PASS — official Q4_K_M GGUF is 2,143,977,056 bytes / about 2.0 GiB; with Whisper `small` at about 500 MB, projected model payload is about 2.65 GB, under the 3.5 GB app-size target before app overhead |
-| Model runs on a supported physical iPhone within PRD latency targets | TODO — teammate with supported iPhone should follow `docs/specs/tiny-aya-device-test.md` |
-| Tiny-Aya-only memory smoke test is stable on a supported physical iPhone | TODO — teammate with supported iPhone should follow `docs/specs/tiny-aya-device-test.md` |
+| Model runs on a supported physical iPhone within PRD latency targets | PASS — see Device Test Result below; 3/3 runs in airplane mode on iPhone 16 Pro Max, well within the 8 s Pro-tier target, confirming full offline latency compliance |
+| Tiny-Aya-only memory smoke test is stable on a supported physical iPhone | PASS — see Device Test Result below; 10 runs over 10+ minutes on iPhone 16 Pro Max, peak 274.7 MB, flat memory profile, no crash/jetsam |
 | Combined WhisperKit + Tiny-Aya memory test has an owner | TODO — coordinate with issue #2; use `TinyAyaDeviceTest` for the Tiny-Aya side once WhisperKit small is available |
 | Apple Translation can work offline in the app path for Tier 1/demo languages | PASS WITH LIMITATION — works in Airplane Mode only after language assets are downloaded/prepared; fresh Airplane Mode without downloaded assets fails; use only as fallback, not planned v1 path |
 | Fluent-speaker validation plan exists for TestFlight / field testing | TODO |
+
+## Device Test Result (2026-07-25)
+
+Both Test 4 (latency) and Test 5 (Tiny-Aya-only memory smoke test) complete and passing.
+
+Two passes were run: an initial online pass, then a proper 3-run pass in airplane mode (the
+protocol Test 4 actually calls for). The airplane-mode numbers below are the ones that count —
+they confirm Tiny-Aya's offline-from-first-launch behavior, per PRD §"Offline" and ADR-008.
+
+```text
+Device: Steph's iPhone 16 Pro Max
+iOS: 26.5.2
+Test date: 2026-07-25
+Tester: Stephanie Xue
+App/branch/commit: TinyAyaDeviceTest, docs/tiny-aya-device-test-results @ fcb0253
+Model file: tiny-aya-earth-q4_k_m.gguf
+Model SHA256: 01ecc5d1195a21a9e3e2efa4f4b7c547502a58efda8d38b80646823b56d383c4
+Airplane mode: on (confirmed via Control Center + status bar airplane icon)
+
+Latency (airplane mode, 3 runs):
+- Load time: 0.578 s (same load reused for all 3 runs)
+- First token latency, run 1 / 2 / 3: 0.605 s / 0.515 s / 0.522 s
+- Total generation time, run 1 / 2 / 3: 1.151 s / 1.116 s / 1.077 s
+- Tokens/sec, run 1 / 2 / 3: 8.69 / 8.96 / 9.28
+- Generated translation, all 3 runs: "I need help finding a place to stay tonight." (correct,
+  identical across runs)
+- Crash/freeze/kill: none
+- PASS/FAIL: PASS (all 3 runs well within the 8 s iPhone 15 Pro+ target, fully offline)
+
+For reference, an earlier online-only pass (Wi-Fi/cellular on) showed closely matching
+numbers: load 0.390 s, first token 0.477 s, total gen 0.981 s, 10.19 tok/s — confirming no
+meaningful difference between online and offline behavior for Tiny-Aya, as expected for a
+fully local `.gguf` model.
+
+Tiny-Aya-only memory:
+- Whisper included: no
+- Memory per run (MB), runs 1–10: 274.5 / 274.6 / 274.7 / 274.7 / 274.6 / 274.6 / 274.1 / 274.3 /
+  274.3 / 274.3
+- Peak memory: 274.7 MB
+- 10-minute run completed: yes
+- Crash/jetsam: none — all 10 runs completed, no crash, freeze, or kill
+- PASS/FAIL: PASS (memory stayed flat within a ~0.6 MB band across 10 runs over 10+ minutes, no
+  instability)
+```
 
 ## Conversion Notes
 
