@@ -1,95 +1,107 @@
-# Hearth iOS — Production Roadmap
+# Hearth iOS — UI-First Production Roadmap
 
-Companion to `PRD.md` (what) and `adr/ADRs.md` (how). This file covers migration, team,
-schedule, risks, and release. Sprint task detail lives in `sprints/`.
+Companion to `PRD.md`, `adr/ADRs.md`, and the task details in `sprints/`.
 
-## 1. The central design tension (resolved)
+**Rebaselined:** 2026-07-19 · **Current milestone:** internal August build ·
+**Public release:** deliberately unscheduled
 
-iOS has **no system TTS voices for sub-Saharan African languages**; the African languages
-with great iOS TTS (Arabic, French, Portuguese) are ones mainstream tools already handle.
-Resolution: **tiered language support** (PRD §3) — Tier 1 full voice loop, Tier 2 voice-in /
-large-type-out. This keeps the low-resource differentiation AND a voice UX, honestly.
+## 1. Rebaseline decision
 
-## 2. Migration map (prototype → iOS)
+Target-language selection is no longer on the August critical path. The team will build the
+product around normalized language codes and injected engine protocols, using Tiny-Aya Earth
+without Hearth-specific fine-tuning as the provisional local translator.
 
-| Prototype component | Fate | iOS counterpart |
+This changes validation order, not Hearth's privacy architecture:
+
+- UI, state management, typed translation, audio, and lifecycle work proceed now.
+- WhisperKit supplies the resident source-language code for voice turns.
+- TTS behavior is based on whether the device has a voice for that code; text is the fallback.
+- Translation accuracy and final language support are evaluated later with fluent speakers.
+- The August deliverable is an internal build. App Store work resumes after a release decision.
+
+## 2. Guardrails for implementation
+
+1. No networking, analytics, content persistence, or new dependencies.
+2. Final-language assumptions may not appear in views or engine protocols.
+3. Preview/test language values must be named as fixtures, not `supportedLanguages`.
+4. Release code depends on protocols; SwiftUI previews and unit tests use mocks.
+5. Tiny-Aya model files remain human-managed and uncommitted in agent work.
+6. Each PR stays near 400 changed lines and implements one ticket only.
+7. Physical-device, audio-session, model-memory, signing, and distribution work remains
+   human-owned even when an agent prepares code or checklists.
+
+## 3. Dependency order
+
+| Gate | Work unlocked | May run in parallel |
 |---|---|---|
-| `reference/frontend/types.ts` domain model | **Port 1:1** | `Hearth/Domain/` structs & enums |
-| `reference/frontend/hooks.ts` `useConversation` state machine | **Port** (the TS is the spec) | `ConversationViewModel` |
-| Prompt + output cleaning, `reference/backend/main.py:81-146` | **Port verbatim** | `TinyAyaEngine` prompt builder |
-| Dual-rotated split UI (`translate-page.tsx` + CSS) | **Rebuild** per `design/UI-SPEC.md` | `ConversationView` |
-| Server Whisper + MediaRecorder plumbing | **Rebuild** | WhisperKit + `AudioSessionManager` |
-| Aya via HuggingFace cloud | **Rebuild** | llama.cpp GGUF on-device (ADR-003) |
-| Browser SpeechSynthesis TTS | **Rebuild** | `AVSpeechSynthesizer` with tier logic |
-| `aggression.py` keyword filter | Optional stretch port (silent skip only) | `SafetyFilter` |
-| `SupportPanel.tsx:17-40` language list | **Refactor** | LanguageSheet data |
-| FastAPI app, CORS, Twilio, HF tokens, Next proxy routes, `WebSpeechTranslationService`, region picker, sw.js, transcript store/overlay, prompt library | **Removed** | — |
+| Repository guardrails | All product changes | Design-system work after the Xcode target is stable |
+| Supporting-screen spec | Device gate, loading, onboarding, settings | Foundation work |
+| Language-neutral domain | Engine contracts, message UI | Fixture-only previews |
+| Frozen engine contracts + mocks | ViewModel and real engine adapters | Audio and model device investigations |
+| Design system | Landing and conversation components | ViewModel work |
+| Conversation ViewModel + UI components | Mock-powered integrated UI | Tiny-Aya adapter |
+| Tiny-Aya adapter | Typed local conversation | Loading UI and privacy lifecycle |
+| Audio manager + WhisperKit + System TTS | Voice conversation | Onboarding and settings |
+| Integrated voice loop | Accessibility and final device verification | Documentation cleanup |
 
-## 3. Team & ownership (4 people × 2–3 h/week — agent-heavy by necessity)
+Critical path:
 
-| | A — AI Engines | B — UI | C — Speech & Audio | D — Release & Quality |
-|---|---|---|---|---|
-| Owns | `Engines/Translation`, model conversion, bake-off, ADR-003 gate | `Features/*`, DesignSystem, accessibility | `Audio/`, `Engines/SpeechToText`, `Engines/TextToSpeech` | repo/CI, TestFlight, App Store Connect, privacy, App Review |
-| Success | ≤8 s round-trip on 15 Pro; bake-off table published | stranger completes a conversation uninstructed; UI matches spec | STT survives a phone-call interruption | app live by Aug 28 |
+`repo → domain → protocols/mocks → ViewModel + conversation UI → Tiny-Aya typed loop → voice loop → August verification`
 
-Critical path: Sprint 0 spike (A) → engine protocols frozen → integration → TestFlight (D)
-→ App Review. B works fully in parallel against mock engines from day one.
-Review rules: 1 human review per PR from the owning vertical; protocol changes need 2.
+The final-language decision is outside this graph. The audio/model owners should still start
+their physical-device lanes early because agents and simulators cannot complete those gates.
 
-## 4. Schedule (2-week sprints)
+## 4. Schedule
 
-| Sprint | Dates | Theme | Exit criteria |
-|---|---|---|---|
-| 0 | Jun 15–28 | Spike & decide | ADR-003 GO/fallback decided; languages fixed; repo+CI live; Apple Dev enrolled |
-| 1 | Jun 29–Jul 12 | Foundation | mock-powered conversation demo in rotated dual-pane UI; CI green |
-| 2 | Jul 13–26 | Real STT | airplane-mode speech → transcript + detected language on device |
-| 3 | Jul 27–Aug 9 | Translation + TTS | full conversation loop in ≥3 languages offline; latency measured |
-| 4 | Aug 10–16 | Hardening + beta | memory-safe on 6 GB device; TestFlight external beta out Aug 14 |
-| 5 | Aug 17–28 | Submit & buffer | **submit Aug 20**; approved + released; presentation uses store build |
+GitHub title prefixes are execution phases: P0 foundation, P1 mock UI, P2 typed local
+translation, P3 voice integration, and P4 polish/verification. Within a phase, the explicit
+“Depends on” links in each issue take precedence over issue number or assignee.
 
-## 5. AI-agent usage policy
+| Sprint | Dates | Outcome |
+|---|---|---|
+| 1 | Jul 19–26 | Guardrails, language-neutral foundation, design system, app shell |
+| 2 | Jul 27–Aug 4 | Complete conversation UI driven by mocks |
+| 3 | Aug 5–13 | Typed two-way conversation through local Tiny-Aya Earth |
+| 4 | Aug 14–23 | Voice input, detected language, TTS/text fallback, full loop |
+| 5 | Aug 24–31 | Onboarding, settings, accessibility, offline device build |
 
-**Agent-safe (~70%):** domain/ViewModel ports (paste the TS source into the prompt — it's an
-executable spec), all SwiftUI views (review vs screenshots), mocks, unit tests, TTS engine,
-sheets/onboarding/settings, CI YAML, App Store copy drafts.
-**Human-owned (~30%):** Tiny Aya spike + engine core, AVAudioSession lifecycle, memory and
-latency profiling, ADRs, signing/provisioning, privacy labels, App Review comms, language
-selection.
-Anti-drift: `CLAUDE.md` hard rules; networking grep-ban in CI; frozen protocols; closed
-dependency list; ≤400-line PRs; spec-before-code in `docs/specs/`.
+Tasks may start before their named sprint when their dependencies are complete. Sprint numbers
+describe the expected integration order, not a reason to leave an unblocked human lane idle.
 
-## 6. Risk register
+## 5. Team ownership
 
-| Risk | P | Impact | Mitigation |
-|---|---|---|---|
-| Tiny Aya won't run / too slow on-device | M-H | Critical | Sprint 0 timebox; Apple Translation fallback behind same protocol (ADR-003) |
-| Tiny Aya quality < Google on chosen languages | M | High | bake-off *selects* languages where it wins; publish honest comparison |
-| Team capacity (2–3 h/wk is optimistic) | H | High | agent-heavy plan; ruthless scope; Sprint 5 is pure buffer; every feature has a ship-without answer |
-| App Review rejection (big binary, niche UX, first submission) | M | High | submit Aug 20 = one rejection cycle of buffer; thorough review notes; TestFlight beta review as early warning |
-| Jetsam on 6 GB devices | M | Medium | Q4 quant, lazy load, unload Whisper during LLM if needed; Instruments gate Sprint 4; worst case raise floor to 8 GB |
-| TTS gap for flagship low-resource langs | certain | Medium | tier design + expectation-setting UI badge |
-| Apple enrollment delay | L | High if late | enroll week 1 |
-| Aya license ambiguity | L | Medium | verify text in Sprint 0; attribution screen; app is free |
+| Role | Owns | August evidence |
+|---|---|---|
+| A — AI Engines | Protocol review, Tiny-Aya adapter, prompt/cleanup | Local typed translation and device timings |
+| B — UI | Design system and `Features/*` | Screenshot comparison and mock-powered flow |
+| C — Speech & Audio | Audio session, WhisperKit, system TTS | Physical-device voice loop and interruption notes |
+| D — Release & Quality | CI, privacy checks, build verification | Reproducible internal build; no App Store work yet |
 
-## 7. App Store release checklist (owner: D)
+## 6. August definition of done
 
-1. **Week 1:** enroll Apple Developer Program ($99/yr, individual account is fine).
-2. Xcode automatic signing throughout — no manual provisioning.
-3. App Store Connect record early: reserve name "Hearth" (backup: "Hearth Translate"),
-   bundle ID `org.hearthapp.hearth` (or similar).
-4. Privacy: one-page policy on GitHub Pages (free) stating nothing leaves the device;
-   nutrition label "Data Not Collected"; plain-language `NSMicrophoneUsageDescription`.
-5. TestFlight: internal from Sprint 2; external beta (mini-review) by Aug 14.
-6. Review notes: explain the intentional 180° pane, the offline design, test phrases for a
-   solo reviewer, and why the binary is large (bundled on-device models).
-7. Accessibility pass before submission (VoiceOver, Dynamic Type, contrast).
-8. No analytics/crash SDKs — Xcode Organizer crash reports only (consistent with privacy label).
-9. Submit by **Aug 20**; respond to rejections within 24 h; manual release (not phased).
+- CI builds and tests without model weights and enforces the networking ban.
+- UI matches `landing.png` and `translation.png`, excluding prototype features cut by the spec.
+- Mocks exercise every state and error path without loading ML models.
+- A human installs the model-enabled build on a supported iPhone and tests in airplane mode.
+- Typed and voice turns work in both directions for smoke-test inputs.
+- TTS support is discovered at runtime; missing voices fall back to readable large text.
+- End-session and background timeout erase in-memory content.
+- Results do not claim that any language is production-supported or accurately translated.
 
-## 8. v2 parking lot (do not build in v1)
+## 7. Risks and containment
 
-Transcript history (encrypted, staff PIN, retention settings — the prototype's
-`transcriptStore` + kiro spec are the blueprint), support prompt library (content already
-written in `reference/frontend/components/SupportPanel.tsx`), harmful-language handling
-done right (context-aware, never blocks disclosures), region model variants, code-switching,
-iPad side-by-side layout, additional languages as iOS TTS coverage grows.
+| Risk | Containment |
+|---|---|
+| Tiny-Aya is slow or unstable | Keep UI/mock path independent; record device results; do not block UI delivery |
+| WhisperKit language detection is weak | Surface detected code for diagnostics; defer marketed support claims |
+| No iOS TTS voice exists | Use large text automatically; do not maintain premature tiers |
+| Engine protocols drift | Freeze after two-human review; adapters absorb model changes |
+| Remaining time is short | Typed local loop is the first integration milestone; voice and polish build on it |
+| Agents overreach | Ticket file boundaries, explicit non-goals, mock-only tests, human device gates |
+
+## 8. After August
+
+Humans choose target languages using shelter relevance, model support, Whisper results, TTS
+availability, and fluent-speaker evaluation. Only then should the team add a public supported-
+language catalog, manual language sheet, fine-tuning plan, quality thresholds, external beta,
+App Store assets, and a release date.

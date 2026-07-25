@@ -13,7 +13,8 @@ Native Swift/SwiftUI rewrite of the award-winning
 
 ## Status
 
-**Pre-development.** Target: public App Store release by end of August 2026.
+**UI-first development.** Target: installable internal build by August 31, 2026. Final
+languages, translation-quality validation, and the public release date are still to be decided.
 
 ## Start here
 
@@ -21,7 +22,7 @@ Native Swift/SwiftUI rewrite of the award-winning
 |---|---|
 | [`docs/PRD.md`](docs/PRD.md) | What v1 is — and explicitly is not |
 | [`docs/adr/ADRs.md`](docs/adr/ADRs.md) | The 8 architecture decisions (guardrails for humans **and** AI agents) |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Migration strategy, team structure, risks, App Store plan |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Current dependency order, team structure, schedule, and risks |
 | [`docs/design/UI-SPEC.md`](docs/design/UI-SPEC.md) | Exact design tokens + per-screen specs to replicate the prototype UI |
 | [`docs/sprints/`](docs/sprints/) | Sprint-by-sprint task lists with acceptance criteria |
 | [`AGENTS.md`](AGENTS.md) | Rules for ALL AI coding agents (Codex, Claude Code, Cursor) — single source of truth |
@@ -51,4 +52,6 @@ Jasmine Zou · Jianding Bai · Yuko Murayama · Stephanie Xue
 - 100% on-device, zero network, zero backend — the FastAPI server is deleted, not ported
 - STT: WhisperKit (`small`) · MT: one Tiny Aya GGUF via llama.cpp (fallback: Apple Translation) · TTS: AVSpeechSynthesizer
 - SwiftUI + MVVM · iOS 17+ · devices with ≥6 GB RAM (iPhone 12 Pro / iPhone 14 and newer)
+- Final language support and model accuracy are post-August validation decisions, not UI or
+  engine-integration blockers
 - Cut from v1: transcript history, support prompts, region picker, SMS alerts, accounts, analytics
