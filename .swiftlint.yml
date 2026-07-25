@@ -1,0 +1,21 @@
+included:
+  - Hearth/Hearth
+  - Hearth/HearthTests
+  - Hearth/HearthUITests
+
+excluded:
+  - Hearth/Hearth/Assets.xcassets
+
+opt_in_rules:
+  - force_unwrapping
+
+force_cast:
+  severity: error
+
+force_try:
+  severity: error
+
+force_unwrapping:
+  severity: error
+
+reporter: xcode
