@@ -23,6 +23,7 @@ languages, translation-quality validation, and the public release date are still
 | [`docs/PRD.md`](docs/PRD.md) | What v1 is — and explicitly is not |
 | [`docs/adr/ADRs.md`](docs/adr/ADRs.md) | The 8 architecture decisions (guardrails for humans **and** AI agents) |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Current dependency order, team structure, schedule, and risks |
+| [`docs/backlog/model-enrichment.md`](docs/backlog/model-enrichment.md) | Post-language-selection model evaluation and enrichment order |
 | [`docs/design/UI-SPEC.md`](docs/design/UI-SPEC.md) | Exact design tokens + per-screen specs to replicate the prototype UI |
 | [`docs/sprints/`](docs/sprints/) | Sprint-by-sprint task lists with acceptance criteria |
 | [`AGENTS.md`](AGENTS.md) | Rules for ALL AI coding agents (Codex, Claude Code, Cursor) — single source of truth |

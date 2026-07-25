@@ -1,42 +1,32 @@
-# Sprint 4 — Hardening + Beta (Aug 10–16, one week)
+# Sprint 4 — Voice Loop and Runtime Capabilities (Aug 14–23)
 
-**Goal:** external TestFlight beta in real hands by **Aug 14**; the app is App-Store-grade.
+**Goal:** connect live speech input and capability-based output without choosing launch
+languages. The audio/model owners may start these tasks earlier when dependencies are ready.
 
 ## Tasks
 
-### 4.1 — Onboarding · Owner B · agent-safe
-≤3 icon-driven screens (hold-to-talk, pass the phone, "nothing leaves this device"),
-shown once (UserDefaults flag). Minimal text — users may not read English.
-**Acceptance:** a first-time user starts a conversation with no help.
+### 4.1 — WhisperKit device spike · Owner C · human device test · [#2](https://github.com/Lada496/hearth-ios/issues/2)
+Validate recording-to-transcript and language-code output with several smoke fixtures. Report
+latency, memory, and failures without classifying any language as supported.
 
-### 4.2 — Accessibility pass · Owner B · agent-assisted + manual VoiceOver test
-VoiceOver labels on every control (mind the rotated pane!), Dynamic Type on worker side,
-contrast check (tokens are already AAA — verify nothing regressed), ≥44 pt targets.
-**Acceptance:** full conversation completed with VoiceOver; checklist in PR.
+### 4.2 — AudioSessionManager · Owner C · human-owned · [#13](https://github.com/Lada496/hearth-ios/issues/13)
+Produce 16 kHz mono PCM, handle permission denial, interruptions, and record/playback handoff.
+Physical-device evidence is required.
 
-### 4.3 — Edge-case sweep · Owner C · human-led
-Phone call mid-recording; Bluetooth/wired route changes; Control-Center mic kill; backgrounding
-mid-translation; rapid double-press; storage-full launch; locale set to RTL language.
-**Acceptance:** each scenario handled or consciously documented; no crashes.
+### 4.3 — WhisperKitSTT adapter · Owner C · agent-safe glue, human device review · [#22](https://github.com/Lada496/hearth-ios/issues/22)
+Implement the frozen protocol with the bundled multilingual model. Keep framework details behind
+an adapter so unit tests use fakes and no weights.
 
-### 4.4 — App Store assets · Owner D · agent-safe drafts, human final
-Icon (from `docs/design/screenshots/hearth-logo.png` mark), screenshots (6.7" + 6.1"),
-description (states offline design + large download + device requirements), keywords,
-privacy policy page (GitHub Pages), privacy nutrition label "Data Not Collected".
-**Acceptance:** App Store Connect listing complete in draft.
+### 4.4 — System TTS and text fallback · Owner C/B · agent-safe · [#32](https://github.com/Lada496/hearth-ios/issues/32)
+Choose the best installed voice for the runtime language code. Return unsupported when none
+exists; the ViewModel then exposes large text instead of a play action.
 
-### 4.5 — External TestFlight beta · Owner D · human-owned
-Submit for Beta App Review; distribute to external testers — ideally a Bloom Group contact
-+ friends with target-language skills.
-**Acceptance:** beta live by Aug 14; feedback channel (GitHub issues template) ready.
-
-### 4.6 — STRETCH (only if 4.1–4.5 done): SafetyFilter · agent-safe
-Port `reference/backend/aggression.py` keyword list to a Swift regex check on the English
-text. On hit: silently skip translation, show a neutral "couldn't translate" state.
-**No alerts, no SMS, no blocking banner** (team decision 2026-06-10). Review the keyword
-list first — remove entries likely to block disclosures (e.g. bare "die", "get out").
+### 4.5 — Wire the full voice loop · Owner A/C · agent-safe, human device review · [#34](https://github.com/Lada496/hearth-ios/issues/34)
+Connect press-and-hold audio, STT detection, Tiny-Aya translation, optional TTS, replay, errors,
+and record/playback exclusion. Preserve the typed path.
 
 ## Exit criteria
-- [ ] External beta in non-team hands by Aug 14
-- [ ] Zero known crashes; memory gate from 3.5 still passing
-- [ ] Listing assets ready for submission
+
+- A supported iPhone completes both conversation directions in airplane mode.
+- Missing TTS voices produce readable text, not an error.
+- No result is described as proof of production translation quality.

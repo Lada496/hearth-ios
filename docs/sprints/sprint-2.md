@@ -1,45 +1,36 @@
-# Sprint 2 — Real STT (Jul 13–26)
+# Sprint 2 — Mock-Powered Conversation UI (Jul 27–Aug 4)
 
-**Goal:** in airplane mode, speak French (or Arabic, Swahili…) into the device and see the
-correct transcript with the correct detected language in the UI. Translation stays mocked.
+**Goal:** complete the signature UI and interaction state without real audio or model files.
+Read `../design/UI-SPEC.md` and compare every UI PR with the approved screenshots.
 
 ## Tasks
 
-### 2.1 — WhisperKitSTT engine · Owner C · agent-safe, device-test review
-Implement `SpeechToText` with WhisperKit `small` (bundled model per ADR-008). Expose
-detection confidence. Reject sub-1 s utterances with a typed error → UI shows "Hold the
-button and speak". Lazy `prepare()` with progress callback for the loading UX.
-**Acceptance:** airplane-mode transcripts for all launch languages from live mic; unit tests
-for the error paths (mock the WhisperKit layer).
+### 2.1 — Dual-pane conversation shell · Owner B · agent-safe · [#19](https://github.com/Lada496/hearth-ios/issues/19)
+Build equal resident/worker panes, rotate the entire resident pane, add the glass divider, and
+use fixture content in previews only.
 
-### 2.2 — Wire STT into ConversationViewModel · Owner A · agent-safe
-Replace `MockSTT`. Flow per PRD story 2: record → transcribe → (mock-)translate → message.
-Low-confidence detection (< threshold, tune empirically) or unsupported language →
-surface "set language manually" affordance.
-**Acceptance:** existing ViewModel tests still pass with mocks; new tests for low-confidence path.
+### 2.2 — Message presentation · Owner B · agent-safe · [#25](https://github.com/Lada496/hearth-ios/issues/25)
+Implement latest-message display, message bubbles, entry motion, and speech/text capability
+indicators. Do not call a speech engine from the view.
 
-### 2.3 — LanguageSheet · Owner B · agent-safe
-UI-SPEC §4e. Sets the session resident language; reachable from the center divider; shows
-current session language + tier badge in the divider.
-**Acceptance:** manual selection overrides detection for subsequent turns.
+### 2.3 — Conversation controls · Owner B · agent-safe · [#26](https://github.com/Lada496/hearth-ios/issues/26)
+Implement hold-to-record mic visuals, disabled states, pulse rings, and processing dots as
+reusable views. Gesture callbacks are injected; no audio work is in scope.
 
-### 2.4 — Model loading UX · Owner B · agent-safe
-First-launch warm-up screen (Whisper load takes seconds): progress indication in Hearth's
-visual language, never a blank screen. Subsequent launches: background prepare with the UI
-usable for typing.
-**Acceptance:** cold-start to usable < 10 s on min device (record actual figure).
+### 2.4 — Text input bar · Owner B · agent-safe · [#27](https://github.com/Lada496/hearth-ios/issues/27)
+Implement collapsed/expanded input, multiline limit, send/disabled behavior, and rotated-pane
+keyboard handling. It emits text only.
 
-### 2.5 — Typed input path · Owner B · agent-safe
-Port TextInputBar (UI-SPEC §4d) behavior: worker types English → (mock) translate; resident
-types → language detection deferred to translation engine (Sprint 3) — for now route through
-manual session language.
-**Acceptance:** both input bars functional; collapse/expand animation per spec.
+### 2.5 — Conversation ViewModel · Owner A/B · agent-safe · [#9](https://github.com/Lada496/hearth-ios/issues/9)
+Port the reference state machine against mocks. Preserve concurrency guards, empty-input
+behavior, readable errors, session language metadata, and idle recovery with unit tests.
 
-### 2.6 — Internal TestFlight · Owner D · human-owned
-First signed build to internal testers (the team).
-**Acceptance:** all 4 members run the build on their own iPhones.
+### 2.6 — Bind the conversation UI to mocks · Owner B · agent-safe · [#31](https://github.com/Lada496/hearth-ios/issues/31)
+Connect the completed components to the ViewModel. Both typed and simulated mic actions must
+exercise happy, processing, disabled, and error states.
 
 ## Exit criteria
-- [ ] Airplane-mode speech → correct transcript + language flag on device, all launch languages
-- [ ] Internal TestFlight build installed by whole team
-- [ ] Latency: mic-release → transcript visible measured and recorded per device
+
+- A complete two-person conversation can be demonstrated with mocks.
+- Views contain no engine implementations or final-language branches.
+- Screenshot comparison passes for landing and conversation.
