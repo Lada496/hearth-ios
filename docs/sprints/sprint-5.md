@@ -1,36 +1,31 @@
-# Sprint 5 — Submit & Buffer (Aug 17–28)
+# Sprint 5 — Polish and August Build (Aug 24–31)
 
-**Goal:** app approved and live on the App Store; presentation demo runs the store build.
-This sprint is deliberately light — it absorbs beta feedback and one App Review rejection cycle.
+**Goal:** produce a stable, private, internally installable build. App Store submission and
+external beta are not in this sprint.
 
 ## Tasks
 
-### 5.1 — Beta feedback triage · Owner all · human-led
-Fix only: crashes, blockers, translation-quality embarrassments in launch languages.
-Everything else → v2 parking lot (`ROADMAP.md` §8).
+### 5.1 — Onboarding · Owner B · agent-safe · [#29](https://github.com/Lada496/hearth-ios/issues/29)
+Add at most three icon-led pages for hold-to-talk, pass-the-phone, and offline privacy. Store only
+the onboarding-seen flag.
 
-### 5.2 — App Review submission · Owner D · human-owned · **deadline Aug 20**
-Review notes must explain: (1) the 180° rotated top pane is intentional two-person UX —
-include `docs/design/screenshots/layout.png`; (2) fully offline by design, hence no
-server/login for the reviewer; (3) sample test phrases per language so a solo English-speaking
-reviewer can validate; (4) binary is large because translation/STT models are bundled
-on-device for privacy.
-**Rejection playbook:** respond within 24 h; common risks pre-answered — "minimum
-functionality" (cite offline AI), "4.2 design spam" (cite custom UX), metadata issues
-(have alternates ready).
+### 5.2 — Settings and attribution · Owner B/D · agent-safe · [#30](https://github.com/Lada496/hearth-ios/issues/30)
+Add privacy, model/library/font attributions, and device information. Do not show a supported language list or tier badges before the language decision.
 
-### 5.3 — Release · Owner D
-Manual release on approval (not phased). Verify the store build on every team device,
-in airplane mode.
+### 5.3 — Accessibility and visual regression · Owner B · agent-assisted · [#35](https://github.com/Lada496/hearth-ios/issues/35)
+Audit VoiceOver on both orientations, worker-side Dynamic Type, contrast, touch targets, reduced
+motion, and screenshots. A human completes the device/VoiceOver pass.
 
-### 5.4 — Presentation prep · Owner all
-Demo script: airplane-mode toggle on stage → live two-language conversation → privacy story
-(show the "Data Not Collected" label) → honest Tier 1/Tier 2 framing with the Sprint 0
-bake-off comparison table vs Google Translate.
+### 5.4 — Offline device verification and August build · Owner C/D · human-owned · [#36](https://github.com/Lada496/hearth-ios/issues/36)
+Run build/tests, networking scan, airplane-mode typed/voice smoke test, interruption test, and a
+ten-minute memory run on a supported iPhone. Record translation outputs without scoring accuracy.
 
-### 5.5 — Project retro + v2 grooming · Owner all
-File v2 epics from the parking lot; archive learnings in `docs/specs/retro.md`.
+### 5.5 — Post-August decision list · Owner all · human-only · [#37](https://github.com/Lada496/hearth-ios/issues/37)
+Record evidence needed for target languages, fluent-speaker validation, fine-tuning, external
+beta, App Store work, and release timing. Do not begin those workstreams in this sprint.
 
 ## Exit criteria
-- [ ] App live on the public App Store
-- [ ] Presentation rehearsed with the store build, offline
+
+- Internal August build installs and runs offline on a supported iPhone.
+- Core typed/voice flows and privacy wipes pass.
+- Deferred language and release decisions are explicit and cannot be mistaken for completed work.
