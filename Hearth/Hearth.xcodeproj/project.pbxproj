@@ -35,7 +35,6 @@
 			membershipExceptions = (
 				Audio/.gitkeep,
 				Engines/Safety/.gitkeep,
-				Features/Conversation/.gitkeep,
 				Features/Landing/.gitkeep,
 				Features/Onboarding/.gitkeep,
 				Features/Settings/.gitkeep,
