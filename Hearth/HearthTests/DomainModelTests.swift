@@ -17,9 +17,13 @@ final class DomainModelTests: XCTestCase {
     // MARK: - Language equality
 
     func testLanguagesWithSameFieldsAreEqual() {
-        let a = Language(code: "en", displayName: "English", flag: "🇬🇧")
-        let b = Language(code: "EN", displayName: "English", flag: "🇬🇧")
-        XCTAssertEqual(a, b, "normalization should make differently-cased codes compare equal")
+        let lowercase = Language(code: "en", displayName: "English", flag: "🇬🇧")
+        let uppercase = Language(code: "EN", displayName: "English", flag: "🇬🇧")
+        XCTAssertEqual(
+            lowercase,
+            uppercase,
+            "normalization should make differently-cased codes compare equal"
+        )
     }
 
     func testLanguagesWithDifferentCodesAreNotEqual() {
