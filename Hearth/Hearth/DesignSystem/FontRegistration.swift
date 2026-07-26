@@ -13,7 +13,7 @@ enum FontRegistration {
         "Nunito[wght]",
         "Nunito-Italic[wght]",
         "PlayfairDisplay[wght]",
-        "PlayfairDisplay-Italic[wght]",
+        "PlayfairDisplay-Italic[wght]"
     ]
 
     static func registerHearthFonts() {

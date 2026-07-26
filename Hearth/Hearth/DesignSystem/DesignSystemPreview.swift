@@ -25,7 +25,7 @@ struct DesignSystemPreview: View {
         ("headingInk", .Hearth.headingInk),
         ("errorBg", .Hearth.errorBg),
         ("placeholder", .Hearth.placeholder),
-        ("bodyBehindShell", .Hearth.bodyBehindShell),
+        ("bodyBehindShell", .Hearth.bodyBehindShell)
     ]
 
     var body: some View {
