@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Debug-only screen rendering every color, typography, radius, and shadow token so a
-/// reviewer can screenshot-compare it against UI-SPEC.md §§1-2 (issue #10 acceptance
-/// criterion 1). Not part of the shipped app flow.
+/// Debug-only screen rendering the visual tokens needed by Hearth's feature views so a
+/// reviewer can screenshot-compare them against UI-SPEC.md (issue #10 acceptance criterion
+/// 1). Not part of the shipped app flow.
 #if DEBUG
 struct DesignSystemPreview: View {
     private let colorSwatches: [(name: String, color: Color)] = [
@@ -26,6 +26,17 @@ struct DesignSystemPreview: View {
         ("errorBg", .Hearth.errorBg),
         ("placeholder", .Hearth.placeholder),
         ("bodyBehindShell", .Hearth.bodyBehindShell)
+    ]
+
+    private let spacingTokens: [(name: String, value: CGFloat)] = [
+        ("landingContentGap", SpacingHearth.landingContentGap),
+        ("ctaVerticalPadding", SpacingHearth.ctaVerticalPadding),
+        ("ctaHorizontalPadding", SpacingHearth.ctaHorizontalPadding),
+        ("dividerVerticalPadding", SpacingHearth.dividerVerticalPadding),
+        ("messageBubbleVerticalPadding", SpacingHearth.messageBubbleVerticalPadding),
+        ("messageBubbleHorizontalPadding", SpacingHearth.messageBubbleHorizontalPadding),
+        ("inputHorizontalMargin", SpacingHearth.inputHorizontalMargin),
+        ("collapsedInputLeadingMargin", SpacingHearth.collapsedInputLeadingMargin)
     ]
 
     var body: some View {
@@ -95,6 +106,35 @@ struct DesignSystemPreview: View {
                     }
                 }
 
+                section("Spacing") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(spacingTokens, id: \.name) { token in
+                            spacingSample(token.name, token.value)
+                        }
+                    }
+                }
+
+                section("Material") {
+                    VStack(spacing: 16) {
+                        Text("Input card glass")
+                            .font(FontHearth.textInput)
+                            .foregroundStyle(Color.Hearth.text)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, SpacingHearth.messageBubbleVerticalPadding)
+                            .padding(.horizontal, SpacingHearth.messageBubbleHorizontalPadding)
+                            .hearthInputCardGlass()
+
+                        Text("Center divider glass")
+                            .font(FontHearth.tabLabel)
+                            .foregroundStyle(Color.Hearth.headingInk)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, SpacingHearth.dividerVerticalPadding)
+                            .hearthCenterDividerGlass()
+                    }
+                    .padding()
+                    .background(Color.Hearth.sideBottom)
+                }
+
                 section("Shadow") {
                     HStack(spacing: 24) {
                         shadowSample("micButtonIdle", ShadowHearth.micButtonIdle)
@@ -126,6 +166,21 @@ struct DesignSystemPreview: View {
                 .foregroundStyle(Color.Hearth.placeholder)
             content()
                 .foregroundStyle(Color.Hearth.text)
+        }
+    }
+
+    private func spacingSample(_ name: String, _ value: CGFloat) -> some View {
+        HStack(spacing: 8) {
+            Text(name)
+                .font(.caption2)
+                .foregroundStyle(Color.Hearth.text)
+                .frame(width: 180, alignment: .leading)
+            Capsule()
+                .fill(Color.Hearth.warmth)
+                .frame(width: value, height: 8)
+            Text("\(Int(value)) pt")
+                .font(.caption2)
+                .foregroundStyle(Color.Hearth.placeholder)
         }
     }
 
