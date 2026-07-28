@@ -25,6 +25,7 @@ struct DesignSystemPreview: View {
         ("headingInk", .Hearth.headingInk),
         ("errorBg", .Hearth.errorBg),
         ("placeholder", .Hearth.placeholder),
+        ("inputIconMuted", .Hearth.inputIconMuted),
         ("bodyBehindShell", .Hearth.bodyBehindShell)
     ]
 
@@ -63,35 +64,55 @@ struct DesignSystemPreview: View {
 
                 section("Typography") {
                     VStack(alignment: .leading, spacing: 12) {
+                        labeled("appBodyRegular") {
+                            Text("Body regular").hearthTypography(TypographyHearth.appBodyRegular)
+                        }
+                        labeled("appBodySemibold") {
+                            Text("Body semibold").hearthTypography(TypographyHearth.appBodySemibold)
+                        }
+                        labeled("appBodyBold") {
+                            Text("Body bold").hearthTypography(TypographyHearth.appBodyBold)
+                        }
+                        labeled("appBodyHeavy") {
+                            Text("Body heavy").hearthTypography(TypographyHearth.appBodyHeavy)
+                        }
                         labeled("landingTitle") {
-                            Text("Hearth").font(FontHearth.landingTitle)
+                            Text("Hearth").hearthTypography(TypographyHearth.landingTitle)
                         }
                         labeled("landingSubtitle") {
-                            Text("Real-time translation, face to face").font(FontHearth.landingSubtitle)
+                            Text("Real-time translation, face to face")
+                                .hearthTypography(TypographyHearth.landingSubtitle)
                         }
                         labeled("ctaButton") {
-                            Text("Start").font(FontHearth.ctaButton)
+                            Text("Start").hearthTypography(TypographyHearth.ctaButton)
                         }
                         labeled("latestTranslation") {
-                            Text("I need help finding shelter.").font(FontHearth.latestTranslation)
+                            Text("I need help finding shelter.\nPlease come with me.")
+                                .hearthTypography(TypographyHearth.latestTranslation)
                         }
                         labeled("languageBadge") {
-                            Text("Kiswahili").font(FontHearth.languageBadge)
+                            Text("Kiswahili").hearthTypography(TypographyHearth.languageBadge)
+                        }
+                        labeled("bubbleLanguageRow") {
+                            Text("🇰🇪 Kiswahili").hearthTypography(TypographyHearth.bubbleLanguageRow)
                         }
                         labeled("bubbleTranslation") {
-                            Text("I need help finding shelter.").font(FontHearth.bubbleTranslation)
+                            Text("I need help finding shelter.\nPlease come with me.")
+                                .hearthTypography(TypographyHearth.bubbleTranslation)
                         }
                         labeled("bubbleOriginal") {
-                            Text("Ninahitaji msaada.").font(FontHearth.bubbleOriginal)
+                            Text("Ninahitaji msaada.\nTafadhali njoo nami.")
+                                .hearthTypography(TypographyHearth.bubbleOriginal)
                         }
                         labeled("tabLabel") {
-                            Text("Translate").font(FontHearth.tabLabel)
+                            Text("Translate").hearthTypography(TypographyHearth.tabLabel)
                         }
                         labeled("textInput") {
-                            Text("Type a message...").font(FontHearth.textInput)
+                            Text("Type a message...").hearthTypography(TypographyHearth.textInput)
                         }
-                        labeled("bodyDynamic") {
-                            Text("Body text scales with Dynamic Type.").font(FontHearth.bodyDynamic)
+                        labeled("errorToast") {
+                            Text("Translation paused. Please try again.")
+                                .hearthTypography(TypographyHearth.errorToast)
                         }
                     }
                 }
@@ -130,6 +151,15 @@ struct DesignSystemPreview: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, SpacingHearth.dividerVerticalPadding)
                             .hearthCenterDividerGlass()
+
+                        Text("Paper grain · 3.5%")
+                            .hearthTypography(TypographyHearth.appBodySemibold)
+                            .foregroundStyle(Color.Hearth.headingInk)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.Hearth.sideTop)
+                            .hearthGrainOverlay()
+                            .clipShape(RoundedRectangle(cornerRadius: RadiusHearth.card))
                     }
                     .padding()
                     .background(Color.Hearth.sideBottom)

@@ -5,6 +5,9 @@ import SwiftUI
 enum MaterialHearth {
     static let glass = Material.ultraThin
 
+    static let grainOpacity = 0.035
+    static let grainTileSize: CGFloat = 64
+
     static let dividerTint = Color.Hearth.sand.opacity(0.55)
     static let dividerBorder = Color.white.opacity(0.5)
 
