@@ -61,6 +61,9 @@ extension Color {
         /// Text-field placeholder.
         static let placeholder = Color(red: 0x96 / 255, green: 0x84 / 255, blue: 0x74 / 255)
 
+        /// Collapsed text-input pencil icon.
+        static let inputIconMuted = Color(red: 0x8A / 255, green: 0x82 / 255, blue: 0x7D / 255)
+
         /// Page background behind the 420 pt shell (iPad/large screens).
         static let bodyBehindShell = Color(red: 0xE8 / 255, green: 0xD9 / 255, blue: 0xC4 / 255)
     }

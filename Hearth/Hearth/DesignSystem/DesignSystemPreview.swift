@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// Debug-only screen rendering every color, typography, radius, and shadow token so a
-/// reviewer can screenshot-compare it against UI-SPEC.md §§1-2 (issue #10 acceptance
-/// criterion 1). Not part of the shipped app flow.
+/// Debug-only screen rendering the visual tokens needed by Hearth's feature views so a
+/// reviewer can screenshot-compare them against UI-SPEC.md (issue #10 acceptance criterion
+/// 1). Not part of the shipped app flow.
 #if DEBUG
 struct DesignSystemPreview: View {
     private let colorSwatches: [(name: String, color: Color)] = [
@@ -25,7 +25,19 @@ struct DesignSystemPreview: View {
         ("headingInk", .Hearth.headingInk),
         ("errorBg", .Hearth.errorBg),
         ("placeholder", .Hearth.placeholder),
+        ("inputIconMuted", .Hearth.inputIconMuted),
         ("bodyBehindShell", .Hearth.bodyBehindShell)
+    ]
+
+    private let spacingTokens: [(name: String, value: CGFloat)] = [
+        ("landingContentGap", SpacingHearth.landingContentGap),
+        ("ctaVerticalPadding", SpacingHearth.ctaVerticalPadding),
+        ("ctaHorizontalPadding", SpacingHearth.ctaHorizontalPadding),
+        ("dividerVerticalPadding", SpacingHearth.dividerVerticalPadding),
+        ("messageBubbleVerticalPadding", SpacingHearth.messageBubbleVerticalPadding),
+        ("messageBubbleHorizontalPadding", SpacingHearth.messageBubbleHorizontalPadding),
+        ("inputHorizontalMargin", SpacingHearth.inputHorizontalMargin),
+        ("collapsedInputLeadingMargin", SpacingHearth.collapsedInputLeadingMargin)
     ]
 
     var body: some View {
@@ -52,35 +64,55 @@ struct DesignSystemPreview: View {
 
                 section("Typography") {
                     VStack(alignment: .leading, spacing: 12) {
+                        labeled("appBodyRegular") {
+                            Text("Body regular").hearthTypography(TypographyHearth.appBodyRegular)
+                        }
+                        labeled("appBodySemibold") {
+                            Text("Body semibold").hearthTypography(TypographyHearth.appBodySemibold)
+                        }
+                        labeled("appBodyBold") {
+                            Text("Body bold").hearthTypography(TypographyHearth.appBodyBold)
+                        }
+                        labeled("appBodyHeavy") {
+                            Text("Body heavy").hearthTypography(TypographyHearth.appBodyHeavy)
+                        }
                         labeled("landingTitle") {
-                            Text("Hearth").font(FontHearth.landingTitle)
+                            Text("Hearth").hearthTypography(TypographyHearth.landingTitle)
                         }
                         labeled("landingSubtitle") {
-                            Text("Real-time translation, face to face").font(FontHearth.landingSubtitle)
+                            Text("Real-time translation, face to face")
+                                .hearthTypography(TypographyHearth.landingSubtitle)
                         }
                         labeled("ctaButton") {
-                            Text("Start").font(FontHearth.ctaButton)
+                            Text("Start").hearthTypography(TypographyHearth.ctaButton)
                         }
                         labeled("latestTranslation") {
-                            Text("I need help finding shelter.").font(FontHearth.latestTranslation)
+                            Text("I need help finding shelter.\nPlease come with me.")
+                                .hearthTypography(TypographyHearth.latestTranslation)
                         }
                         labeled("languageBadge") {
-                            Text("Kiswahili").font(FontHearth.languageBadge)
+                            Text("Kiswahili").hearthTypography(TypographyHearth.languageBadge)
+                        }
+                        labeled("bubbleLanguageRow") {
+                            Text("🇰🇪 Kiswahili").hearthTypography(TypographyHearth.bubbleLanguageRow)
                         }
                         labeled("bubbleTranslation") {
-                            Text("I need help finding shelter.").font(FontHearth.bubbleTranslation)
+                            Text("I need help finding shelter.\nPlease come with me.")
+                                .hearthTypography(TypographyHearth.bubbleTranslation)
                         }
                         labeled("bubbleOriginal") {
-                            Text("Ninahitaji msaada.").font(FontHearth.bubbleOriginal)
+                            Text("Ninahitaji msaada.\nTafadhali njoo nami.")
+                                .hearthTypography(TypographyHearth.bubbleOriginal)
                         }
                         labeled("tabLabel") {
-                            Text("Translate").font(FontHearth.tabLabel)
+                            Text("Translate").hearthTypography(TypographyHearth.tabLabel)
                         }
                         labeled("textInput") {
-                            Text("Type a message...").font(FontHearth.textInput)
+                            Text("Type a message...").hearthTypography(TypographyHearth.textInput)
                         }
-                        labeled("bodyDynamic") {
-                            Text("Body text scales with Dynamic Type.").font(FontHearth.bodyDynamic)
+                        labeled("errorToast") {
+                            Text("Translation paused. Please try again.")
+                                .hearthTypography(TypographyHearth.errorToast)
                         }
                     }
                 }
@@ -93,6 +125,44 @@ struct DesignSystemPreview: View {
                         radiusSample("bubble", RadiusHearth.bubble)
                         radiusSample("senderCorner", RadiusHearth.bubbleSenderCorner)
                     }
+                }
+
+                section("Spacing") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(spacingTokens, id: \.name) { token in
+                            spacingSample(token.name, token.value)
+                        }
+                    }
+                }
+
+                section("Material") {
+                    VStack(spacing: 16) {
+                        Text("Input card glass")
+                            .font(FontHearth.textInput)
+                            .foregroundStyle(Color.Hearth.text)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, SpacingHearth.messageBubbleVerticalPadding)
+                            .padding(.horizontal, SpacingHearth.messageBubbleHorizontalPadding)
+                            .hearthInputCardGlass()
+
+                        Text("Center divider glass")
+                            .font(FontHearth.tabLabel)
+                            .foregroundStyle(Color.Hearth.headingInk)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, SpacingHearth.dividerVerticalPadding)
+                            .hearthCenterDividerGlass()
+
+                        Text("Paper grain · 3.5%")
+                            .hearthTypography(TypographyHearth.appBodySemibold)
+                            .foregroundStyle(Color.Hearth.headingInk)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.Hearth.sideTop)
+                            .hearthGrainOverlay()
+                            .clipShape(RoundedRectangle(cornerRadius: RadiusHearth.card))
+                    }
+                    .padding()
+                    .background(Color.Hearth.sideBottom)
                 }
 
                 section("Shadow") {
@@ -126,6 +196,21 @@ struct DesignSystemPreview: View {
                 .foregroundStyle(Color.Hearth.placeholder)
             content()
                 .foregroundStyle(Color.Hearth.text)
+        }
+    }
+
+    private func spacingSample(_ name: String, _ value: CGFloat) -> some View {
+        HStack(spacing: 8) {
+            Text(name)
+                .font(.caption2)
+                .foregroundStyle(Color.Hearth.text)
+                .frame(width: 180, alignment: .leading)
+            Capsule()
+                .fill(Color.Hearth.warmth)
+                .frame(width: value, height: 8)
+            Text("\(Int(value)) pt")
+                .font(.caption2)
+                .foregroundStyle(Color.Hearth.placeholder)
         }
     }
 
