@@ -1,6 +1,7 @@
 import XCTest
 @testable import Hearth
 
+@MainActor
 final class EngineProtocolTests: XCTestCase {
     // MARK: - SpeechToText
 
@@ -13,7 +14,7 @@ final class EngineProtocolTests: XCTestCase {
         )
 
         try await stt.prepare()
-        let result = try await stt.transcribe(AudioBuffer(pcmData: Data([0x01, 0x02])))
+        let result = try await stt.transcribe(AudioBuffer(samples: [0.1, -0.1]))
 
         XCTAssertEqual(result.text, "Ninahitaji msaada.")
         XCTAssertEqual(result.detectedLanguage, TestFixtures.FixtureLanguage.swahili)
@@ -27,8 +28,28 @@ final class EngineProtocolTests: XCTestCase {
         stt.transcribeDelaySeconds = 0.05
 
         let start = Date()
-        _ = try await stt.transcribe(AudioBuffer(pcmData: Data()))
+        _ = try await stt.transcribe(AudioBuffer(samples: []))
         XCTAssertGreaterThanOrEqual(Date().timeIntervalSince(start), 0.05)
+    }
+
+    func testMockSTTPropagatesCancellation() async {
+        let stt = MockSTT()
+        stt.transcribeDelaySeconds = 1
+
+        let task = Task {
+            try await stt.transcribe(AudioBuffer(samples: []))
+        }
+        await Task.yield()
+        task.cancel()
+
+        do {
+            _ = try await task.value
+            XCTFail("expected cancellation to be thrown")
+        } catch is CancellationError {
+            // expected
+        } catch {
+            XCTFail("expected CancellationError, got \(error)")
+        }
     }
 
     func testMockSTTInjectedFailure() async {
@@ -36,7 +57,7 @@ final class EngineProtocolTests: XCTestCase {
         stt.errorToThrow = .audioTooShort
 
         do {
-            _ = try await stt.transcribe(AudioBuffer(pcmData: Data()))
+            _ = try await stt.transcribe(AudioBuffer(samples: []))
             XCTFail("expected audioTooShort to be thrown")
         } catch SpeechToTextError.audioTooShort {
             // expected
@@ -112,7 +133,6 @@ final class EngineProtocolTests: XCTestCase {
         let tts = MockTTS()
         tts.supportedLanguageCodes = ["en"]
 
-        try await tts.prepare()
         try await tts.speak("Hello", language: TestFixtures.FixtureLanguage.english)
 
         XCTAssertEqual(tts.speakCallCount, 1)
@@ -153,9 +173,9 @@ final class EngineProtocolTests: XCTestCase {
         XCTAssertEqual(tts.stopCallCount, 1)
     }
 
-    // MARK: - Full mock pipeline (acceptance criterion: runs without model assets)
+    // MARK: - ViewModel pipeline (acceptance criterion: runs without model assets)
 
-    func testFullMockPipelineRunsWithoutModelAssets() async throws {
+    func testInjectedViewModelRunsFullMockPipelineWithoutModelAssets() async throws {
         let stt = MockSTT()
         stt.resultToReturn = SpeechToTextResult(
             text: "Ninahitaji msaada kupata makazi.",
@@ -168,21 +188,58 @@ final class EngineProtocolTests: XCTestCase {
         let tts = MockTTS()
         tts.supportedLanguageCodes = ["en"]
 
-        try await stt.prepare()
-        try await translator.prepare()
-        try await tts.prepare()
-
-        let transcription = try await stt.transcribe(AudioBuffer(pcmData: Data([0x00])))
-        let translated = try await translator.translate(
-            transcription.text,
-            from: transcription.detectedLanguage ?? TestFixtures.FixtureLanguage.swahili,
-            to: TestFixtures.FixtureLanguage.english
+        let viewModel = TestPipelineViewModel(
+            speechToText: stt,
+            translationEngine: translator,
+            textToSpeech: tts
         )
-        try await tts.speak(translated, language: TestFixtures.FixtureLanguage.english)
+        let translated = try await viewModel.run(
+            AudioBuffer(samples: [0]),
+            fallbackSource: TestFixtures.FixtureLanguage.swahili,
+            target: TestFixtures.FixtureLanguage.english
+        )
 
         XCTAssertEqual(translated, "I need help finding shelter.")
         XCTAssertEqual(stt.transcribeCallCount, 1)
         XCTAssertEqual(translator.translateCallCount, 1)
         XCTAssertEqual(tts.speakCallCount, 1)
+    }
+}
+
+@MainActor
+private final class TestPipelineViewModel {
+    private let speechToText: SpeechToText
+    private let translationEngine: TranslationEngine
+    private let textToSpeech: TextToSpeech
+
+    init(
+        speechToText: SpeechToText,
+        translationEngine: TranslationEngine,
+        textToSpeech: TextToSpeech
+    ) {
+        self.speechToText = speechToText
+        self.translationEngine = translationEngine
+        self.textToSpeech = textToSpeech
+    }
+
+    func run(
+        _ audio: AudioBuffer,
+        fallbackSource: Language,
+        target: Language
+    ) async throws -> String {
+        try await speechToText.prepare()
+        try await translationEngine.prepare()
+
+        let transcription = try await speechToText.transcribe(audio)
+        let translated = try await translationEngine.translate(
+            transcription.text,
+            from: transcription.detectedLanguage ?? fallbackSource,
+            to: target
+        )
+
+        if textToSpeech.supports(target) {
+            try await textToSpeech.speak(translated, language: target)
+        }
+        return translated
     }
 }

@@ -1,6 +1,7 @@
 /// Configurable stand-in for `TranslationEngine`, used by SwiftUI previews, the ViewModel
 /// (#9), and unit tests so the whole app can be built and demoed before Tiny-Aya lands (#20).
-final class MockTranslator: TranslationEngine, @unchecked Sendable {
+@MainActor
+final class MockTranslator: TranslationEngine {
     /// Simulated delay for `prepare()`, in seconds. Zero by default so tests stay fast.
     var prepareDelaySeconds: Double = 0
 
@@ -23,7 +24,7 @@ final class MockTranslator: TranslationEngine, @unchecked Sendable {
     func prepare() async throws {
         prepareCallCount += 1
         if prepareDelaySeconds > 0 {
-            try? await Task.sleep(nanoseconds: UInt64(prepareDelaySeconds * 1_000_000_000))
+            try await Task.sleep(nanoseconds: UInt64(prepareDelaySeconds * 1_000_000_000))
         }
         if let errorToThrow {
             throw errorToThrow
@@ -33,7 +34,7 @@ final class MockTranslator: TranslationEngine, @unchecked Sendable {
     func translate(_ text: String, from source: Language, to target: Language) async throws -> String {
         translateCallCount += 1
         if translateDelaySeconds > 0 {
-            try? await Task.sleep(nanoseconds: UInt64(translateDelaySeconds * 1_000_000_000))
+            try await Task.sleep(nanoseconds: UInt64(translateDelaySeconds * 1_000_000_000))
         }
         if let errorToThrow {
             throw errorToThrow

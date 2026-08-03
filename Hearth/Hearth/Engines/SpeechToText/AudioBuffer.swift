@@ -1,14 +1,8 @@
-import Foundation
-
 /// Raw 16 kHz mono PCM audio, produced by `AudioSessionManager` (#13) and consumed by
-/// `SpeechToText`. Deliberately just `Data` — no `AVAudioPCMBuffer` or other framework type
-/// crosses the engine boundary.
+/// `SpeechToText`. No audio-framework type crosses the engine boundary.
 struct AudioBuffer: Sendable, Equatable {
-    let pcmData: Data
-    let sampleRate: Double
+    static let sampleRate: Double = 16_000
 
-    init(pcmData: Data, sampleRate: Double = 16_000) {
-        self.pcmData = pcmData
-        self.sampleRate = sampleRate
-    }
+    /// Mono, normalized PCM Float samples at `sampleRate`.
+    let samples: [Float]
 }

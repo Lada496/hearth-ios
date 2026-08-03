@@ -4,9 +4,6 @@
 ///
 /// Frozen per `AGENTS.md` once merged — signature changes need a new two-human-reviewed PR.
 protocol TextToSpeech: Sendable {
-    /// One-time warm-up. Safe to call again once already prepared.
-    func prepare() async throws
-
     /// Whether a voice exists for `language` on this device right now. Capability-driven, not
     /// a fixed tier list — the answer can differ by device/OS version.
     func supports(_ language: Language) -> Bool
@@ -22,9 +19,6 @@ protocol TextToSpeech: Sendable {
 /// User-facing error boundary — no AVFoundation-specific error type crosses out of the
 /// engine folder.
 enum TextToSpeechError: Error, Sendable, Equatable {
-    /// `speak` was called before a successful `prepare()`.
-    case notPrepared
-
     /// `speak` was called for a language `supports(_:)` had already reported `false` for.
     case unsupportedLanguage
 

@@ -1,10 +1,8 @@
 /// Configurable stand-in for `TextToSpeech`, used by SwiftUI previews, the ViewModel (#9),
 /// and unit tests so the whole app can be built and demoed before the system-TTS adapter
 /// lands (#32).
-final class MockTTS: TextToSpeech, @unchecked Sendable {
-    /// Simulated delay for `prepare()`, in seconds. Zero by default so tests stay fast.
-    var prepareDelaySeconds: Double = 0
-
+@MainActor
+final class MockTTS: TextToSpeech {
     /// Simulated delay for `speak(_:language:)`, in seconds.
     var speakDelaySeconds: Double = 0
 
@@ -12,24 +10,15 @@ final class MockTTS: TextToSpeech, @unchecked Sendable {
     /// language is supported — the caller must opt a code in explicitly.
     var supportedLanguageCodes: Set<String> = []
 
-    /// When set, both `prepare()` and `speak(_:language:)` throw this instead of succeeding.
+    /// When set, `speak(_:language:)` throws this instead of succeeding.
     var errorToThrow: TextToSpeechError?
 
-    private(set) var prepareCallCount = 0
     private(set) var speakCallCount = 0
     private(set) var stopCallCount = 0
+    private(set) var lastSpokenText: String?
+    private(set) var lastSpokenLanguage: Language?
 
     init() {}
-
-    func prepare() async throws {
-        prepareCallCount += 1
-        if prepareDelaySeconds > 0 {
-            try? await Task.sleep(nanoseconds: UInt64(prepareDelaySeconds * 1_000_000_000))
-        }
-        if let errorToThrow {
-            throw errorToThrow
-        }
-    }
 
     func supports(_ language: Language) -> Bool {
         supportedLanguageCodes.contains(language.code)
@@ -38,7 +27,7 @@ final class MockTTS: TextToSpeech, @unchecked Sendable {
     func speak(_ text: String, language: Language) async throws {
         speakCallCount += 1
         if speakDelaySeconds > 0 {
-            try? await Task.sleep(nanoseconds: UInt64(speakDelaySeconds * 1_000_000_000))
+            try await Task.sleep(nanoseconds: UInt64(speakDelaySeconds * 1_000_000_000))
         }
         if let errorToThrow {
             throw errorToThrow
@@ -46,6 +35,8 @@ final class MockTTS: TextToSpeech, @unchecked Sendable {
         guard supports(language) else {
             throw TextToSpeechError.unsupportedLanguage
         }
+        lastSpokenText = text
+        lastSpokenLanguage = language
     }
 
     func stop() {
