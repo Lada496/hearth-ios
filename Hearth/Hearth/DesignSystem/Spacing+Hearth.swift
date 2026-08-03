@@ -10,8 +10,9 @@ enum SpacingHearth {
     static let ctaVerticalPadding: CGFloat = 16
     static let ctaHorizontalPadding: CGFloat = 48
 
-    /// Center-divider vertical content padding.
-    static let dividerVerticalPadding: CGFloat = 6
+    /// Center-divider vertical content padding. Thinned from the prototype's 6 pt
+    /// (`translate-page.module.css`'s `.centerDivider`) per human review during issue #19.
+    static let dividerVerticalPadding: CGFloat = 5
 
     /// Message-bubble content padding.
     static let messageBubbleVerticalPadding: CGFloat = 10
