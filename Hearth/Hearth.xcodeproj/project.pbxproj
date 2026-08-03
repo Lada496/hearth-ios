@@ -34,7 +34,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Audio/.gitkeep,
-				DesignSystem/.gitkeep,
 				Domain/.gitkeep,
 				Engines/Safety/.gitkeep,
 				Engines/SpeechToText/.gitkeep,
