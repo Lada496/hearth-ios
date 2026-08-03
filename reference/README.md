@@ -8,12 +8,15 @@ These files are *specifications*, not code to reuse.
 
 | File | What to port from it |
 |---|---|
-| `frontend/types.ts` | Domain model → `Hearth/Domain/` |
-| `frontend/hooks.ts` | `useConversation` state machine → `ConversationViewModel` |
+| `frontend/types/index.ts` | Domain model → `Hearth/Domain/` |
+| `frontend/hooks/useConversation.ts` | `useConversation` state machine → `ConversationViewModel` |
 | `frontend/lib/hearth-translation-service.ts` | Session-language logic, language/flag maps |
 | `frontend/app/*` + `frontend/components/*` (+ `.module.css`) | UI structure & exact styling — see `docs/design/UI-SPEC.md` |
 | `backend/main.py` | Translation prompts + output-cleaning (lines 81–146) → `TinyAyaEngine` |
 | `backend/aggression.py` | Optional v1-stretch SafetyFilter keyword list |
 
-Not copied (cut from v1): transcript store/overlay, support prompt content, region picker,
-Twilio notify, Next.js API routes, `translation-service.ts` (unused scaffold).
+Not copied (cut from v1): transcript store/overlay (`SaveButton`, `TranscriptList`,
+`TranscriptOverlay`, `TranscriptViewer`, `lib/transcriptStore.ts`, `hooks/useTranscripts.ts`),
+support prompt content, region picker, PWA/service-worker files (`ServiceWorkerRegistrar.tsx`,
+`sw.js`, `manifest.json`), Twilio notify, Next.js API routes, `translation-service.ts`
+(unused scaffold).

@@ -9,11 +9,21 @@ import {
   TextInputBar,
   SaveButton,
   TranscriptOverlay,
+  RegionPicker,
 } from "@/components";
-import { RegionPicker } from "@/components/RegionPicker";
 import { getHearThService } from "@/lib/hearth-translation-service";
 import styles from "./page.module.css";
 
+// Icon for the "view saved transcripts" button
+function TranscriptIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 16H5V5h2v3h10V5h2v14z" />
+    </svg>
+  );
+}
+
+// Main translation screen: talk/support tabs, conversation threads, and transcripts
 export default function AppPage() {
   const hearthServiceRef = useRef<ReturnType<typeof getHearThService> | null>(
     null
@@ -24,6 +34,7 @@ export default function AppPage() {
   const hearthService = hearthServiceRef.current;
   const [activeTab, setActiveTab] = useState<"talk" | "support">("talk");
   const [showOverlay, setShowOverlay] = useState(false);
+  const [bottomInputOpen, setBottomInputOpen] = useState(false);
 
   const {
     messages,
@@ -47,16 +58,17 @@ export default function AppPage() {
     dismissStorageError,
   } = useTranscripts();
 
-  const isRecording = recordingState.status === "recording";
   const isProcessing = recordingState.status === "processing";
   const recordingSpeaker =
     recordingState.status !== "idle" ? recordingState.speaker : null;
 
+  // Send a tapped support prompt as a worker message and switch to the talk tab
   function handlePromptSelect(text: string) {
-    sendMessage(text, "bottom", true);
+    sendMessage(text, "bottom", false);
     setActiveTab("talk");
   }
 
+  // Clear the conversation when the region picker starts a new session
   function handleClearSession() {
     clearConversation();
   }
@@ -162,19 +174,25 @@ export default function AppPage() {
               speaker="bottom"
               onSubmit={submitText}
               isDisabled={recordingState.status !== "idle"}
+              onOpenChange={setBottomInputOpen}
             />
             {/* Transcript controls — pinned to bottom-right, out of flow */}
-            <div className={styles.transcriptControls}>
+            <div
+              className={`${styles.transcriptControls} ${
+                bottomInputOpen ? styles.transcriptControlsRaised : ""
+              }`}
+            >
               <SaveButton
                 onSave={() => saveTranscript(messages)}
                 onClear={clearConversation}
               />
               <button
-                className={styles.transcriptBtn}
+                className={`${styles.transcriptBtn} tooltipEnd`}
                 aria-label="View saved transcripts"
+                data-tooltip="View transcripts"
                 onClick={() => setShowOverlay(true)}
               >
-                📋
+                <TranscriptIcon />
               </button>
             </div>
           </div>

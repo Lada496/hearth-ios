@@ -14,7 +14,9 @@ Add privacy, model/library/font attributions, and device information. Do not sho
 
 ### 5.3 — Accessibility and visual regression · Owner B · agent-assisted · [#35](https://github.com/Lada496/hearth-ios/issues/35)
 Audit VoiceOver on both orientations, worker-side Dynamic Type, contrast, touch targets, reduced
-motion, and screenshots. A human completes the device/VoiceOver pass.
+motion, and screenshots. Include a final non-Latin script pass (Arabic, Ethiopic, CJK,
+Devanagari, etc.) confirming font fallback actually renders correctly on-device, not just in
+simulator fixtures. A human completes the device/VoiceOver pass.
 
 ### 5.4 — Offline device verification and August build · Owner C/D · human-owned · [#36](https://github.com/Lada496/hearth-ios/issues/36)
 Run build/tests, networking scan, airplane-mode typed/voice smoke test, interruption test, and a

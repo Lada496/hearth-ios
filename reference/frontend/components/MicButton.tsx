@@ -15,6 +15,7 @@ interface MicButtonProps {
   flipped?: boolean;
 }
 
+// Hold-to-record mic button, with haptic feedback and optional 180deg flip
 export function MicButton({
   speaker,
   isRecording,
@@ -23,12 +24,14 @@ export function MicButton({
   onStop,
   flipped = false,
 }: MicButtonProps) {
+  // Trigger a haptic vibration pattern, if the device supports it
   const vibrate = (pattern: number | number[]) => {
     if (typeof navigator !== "undefined" && navigator.vibrate) {
       navigator.vibrate(pattern);
     }
   };
 
+  // Begin recording when the button is pressed
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
       e.preventDefault();
@@ -40,6 +43,7 @@ export function MicButton({
     [isDisabled, onStart, speaker]
   );
 
+  // Stop recording when the button is released
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
       e.preventDefault();
@@ -49,6 +53,7 @@ export function MicButton({
     [onStop, speaker]
   );
 
+  // Stop recording if the pointer slides off the button while still held
   const handlePointerLeave = useCallback(
     (e: React.PointerEvent) => {
       e.preventDefault();

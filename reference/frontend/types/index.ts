@@ -26,8 +26,6 @@ export interface TranslationResult {
   translatedText: string;
   /** Timestamp of when the message was created */
   timestamp: number;
-  /** Optional: audio blob URL for playback of the translation */
-  ttsAudioUrl?: string;
 }
 
 export interface SavedTranscript {
@@ -104,18 +102,3 @@ export interface TranslateResult {
   detectedSourceLanguage?: DetectedLanguage;
 }
 
-// ─── TTS playback state ───
-
-export interface PlaybackState {
-  /** ID of the message currently being played, or null */
-  playingId: string | null;
-}
-
-// ─── PWA / service worker ───
-
-export interface PWAStatus {
-  isInstalled: boolean;
-  isOnline: boolean;
-  canInstall: boolean;
-  updateAvailable: boolean;
-}

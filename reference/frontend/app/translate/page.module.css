@@ -177,6 +177,11 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
+  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.transcriptControlsRaised {
+  bottom: 56px;
 }
 
 .transcriptBtn {
@@ -184,22 +189,21 @@
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  transition: background 0.2s, transform 0.15s;
+  color: #8a827d;
+  transition: color 0.2s;
   -webkit-user-select: none;
   user-select: none;
 }
 
 .transcriptBtn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  transform: scale(1.08);
+  color: #787878;
 }
 
-.transcriptBtn:active {
-  transform: scale(0.95);
+.transcriptBtn[data-tooltip]::after {
+  bottom: 100%;
 }

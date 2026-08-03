@@ -67,7 +67,7 @@ Privacy is the product. There is no backend. There is no network code. Ever.
 Hearth/App/            entry point, router, device capability check
 Hearth/Features/       Landing, Onboarding, Conversation, Settings (View+ViewModel pairs)
 Hearth/Engines/        SpeechToText | Translation | TextToSpeech | Safety — protocol + impls + mocks
-Hearth/Domain/         Message, Language, SessionPhase, LanguageTier (ported from reference/frontend/types.ts)
+Hearth/Domain/         Message, Language, SessionPhase, LanguageTier (ported from reference/frontend/types/index.ts)
 Hearth/Audio/          AudioSessionManager (AVAudioSession lifecycle)
 Hearth/DesignSystem/   Color/Font/spacing tokens from docs/design/UI-SPEC.md
 Hearth/Resources/Models/  bundled whisper-small CoreML + tiny-aya GGUF (human-managed)

@@ -1,10 +1,9 @@
-import React from "react";
-
 interface IconProps {
   className?: string;
   size?: number;
 }
 
+// Microphone icon
 export function MicIcon({ className, size = 24 }: IconProps) {
   return (
     <svg
@@ -25,6 +24,7 @@ export function MicIcon({ className, size = 24 }: IconProps) {
   );
 }
 
+// Stop icon
 export function StopIcon({ className, size = 24 }: IconProps) {
   return (
     <svg
@@ -39,6 +39,7 @@ export function StopIcon({ className, size = 24 }: IconProps) {
   );
 }
 
+// Speaker icon, for playing audio aloud
 export function SpeakerIcon({ className, size = 24 }: IconProps) {
   return (
     <svg
@@ -53,6 +54,7 @@ export function SpeakerIcon({ className, size = 24 }: IconProps) {
   );
 }
 
+// Animated equalizer icon, shown while audio is playing
 export function PlayingIcon({ className, size = 24 }: IconProps) {
   return (
     <svg
@@ -125,6 +127,7 @@ export function PlayingIcon({ className, size = 24 }: IconProps) {
   );
 }
 
+// Reset/undo icon
 export function ResetIcon({ className, size = 24 }: IconProps) {
   return (
     <svg

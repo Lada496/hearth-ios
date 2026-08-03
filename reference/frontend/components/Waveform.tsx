@@ -8,6 +8,7 @@ interface WaveformProps {
   barCount?: number;
 }
 
+// Animated bar-waveform visualization shown while recording
 export function Waveform({ active, barCount = 12 }: WaveformProps) {
   const bars = useWaveform(active, barCount);
 

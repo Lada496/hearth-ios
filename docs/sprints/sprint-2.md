@@ -11,7 +11,10 @@ use fixture content in previews only.
 
 ### 2.2 — Message presentation · Owner B · agent-safe · [#25](https://github.com/Lada496/hearth-ios/issues/25)
 Implement latest-message display, message bubbles, entry motion, and speech/text capability
-indicators. Do not call a speech engine from the view.
+indicators. Do not call a speech engine from the view. Verify bubbles render non-Latin
+scripts (Arabic, Ethiopic, CJK, Devanagari, etc.) correctly via iOS's automatic font-fallback
+cascade (UI-SPEC.md §2) — test with more than Latin-script fixture text before calling this
+done.
 
 ### 2.3 — Conversation controls · Owner B · agent-safe · [#26](https://github.com/Lada496/hearth-ios/issues/26)
 Implement hold-to-record mic visuals, disabled states, pulse rings, and processing dots as

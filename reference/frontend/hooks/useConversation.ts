@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import type {
   TranslationResult,
   RecordingState,
@@ -8,12 +8,14 @@ import type {
   TranslationService,
   DetectedLanguage,
 } from "@/types";
+import { getFlag } from "@/lib/hearth-translation-service";
 
-// ─── useConversation ───
-// Manages the full conversation state: messages, recording, translation, playback.
+// Build a DetectedLanguage object from a raw language code
 function makeDetectedLanguage(code: string, confidence = 0.9) {
-  return { code: code.split("-")[0].toLowerCase(), flag: "🇬🇧", confidence };
+  const normalized = code.split("-")[0].toLowerCase();
+  return { code: normalized, flag: getFlag(normalized), confidence };
 }
+
 interface UseConversationReturn {
   messages: TranslationResult[];
   recordingState: RecordingState;
@@ -32,6 +34,7 @@ interface UseConversationReturn {
   dismissError: () => void;
 }
 
+// Manage the full conversation: recording, translation, playback, and history
 export function useConversation(
   service: TranslationService
 ): UseConversationReturn {
@@ -44,10 +47,11 @@ export function useConversation(
   const recordingHandleRef = useRef<any>(null);
 
   // Keep a ref in sync with recordingState so callbacks always see
-  // the latest value without needing it in their dependency arrays.
+  // the latest value without needing it in their dependency arrays
   const recordingStateRef = useRef(recordingState);
   recordingStateRef.current = recordingState;
 
+  // Start capturing microphone audio for the given speaker
   const startRecording = useCallback(
     async (speaker: Speaker) => {
       if (recordingStateRef.current.status !== "idle") return;
@@ -67,6 +71,7 @@ export function useConversation(
     [service]
   );
 
+  // Stop recording, transcribe, translate, and append the resulting message
   const stopRecording = useCallback(
     async (speaker: Speaker) => {
       const currentState = recordingStateRef.current;
@@ -95,7 +100,7 @@ export function useConversation(
         // 2. Translate the transcript
         const translateResult = await service.translate({
           text: recordingResult.transcript,
-          speaker, // ← add this
+          speaker,
           sourceLanguage: recordingResult.detectedLanguage.code,
         });
 
@@ -122,6 +127,7 @@ export function useConversation(
     [service]
   );
 
+  // Translate typed text (as opposed to spoken/recorded audio)
   const submitText = useCallback(
     async (text: string, speaker: Speaker) => {
       if (!text.trim() || recordingStateRef.current.status !== "idle") return;
@@ -130,19 +136,20 @@ export function useConversation(
       setRecordingState({ status: "processing", speaker });
 
       try {
-        // top = resident side → pass non-"en" so service routes to _residentTranslate
-        // bottom = worker side → pass "en" so service routes to _workerTranslate
+        // Top = resident side → pass non-"en" so service routes to _residentTranslate
+        // Bottom = worker side → pass "en" so service routes to _workerTranslate
         const sourceLanguage = speaker === "bottom" ? "en" : "und"; // "und" = undetermined
 
         const translateResult = await service.translate({
           text,
           sourceLanguage,
+          speaker,
         });
 
         const detectedLang: DetectedLanguage =
           translateResult.detectedSourceLanguage ?? {
             code: speaker === "bottom" ? "en" : "und",
-            flag: speaker === "bottom" ? "🇬🇧" : "🌐",
+            flag: speaker === "bottom" ? getFlag("en") : "🌐",
             confidence: 1,
           };
 
@@ -168,6 +175,7 @@ export function useConversation(
     [service]
   );
 
+  // Play a message's audio aloud via TTS, in the appropriate language for the viewer
   const playMessage = useCallback(
     async (messageId: string, viewer: Speaker) => {
       const msg = messages.find((m) => m.id === messageId);
@@ -189,6 +197,7 @@ export function useConversation(
     [messages, playingId, service]
   );
 
+  // Send a pre-written English message (e.g. a Support panel prompt), optionally auto-playing it
   const sendMessage = useCallback(
     async (text: string, speaker: Speaker, autoPlay = false) => {
       if (recordingStateRef.current.status !== "idle") return;
@@ -230,12 +239,14 @@ export function useConversation(
     [service]
   );
 
+  // Reset the conversation back to an empty, idle state
   const clearConversation = useCallback(() => {
     setMessages([]);
     setRecordingState({ status: "idle" });
     setPlayingId(null);
   }, []);
 
+  // Clear the current error message
   const dismissError = useCallback(() => setError(null), []);
 
   return {
@@ -251,184 +262,4 @@ export function useConversation(
     clearConversation,
     dismissError,
   };
-}
-
-// ─── useWaveform ───
-// Generates animated waveform bar heights for the recording visualization.
-
-export function useWaveform(active: boolean, barCount: number = 12) {
-  const [bars, setBars] = useState<number[]>(Array(barCount).fill(4));
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    if (active) {
-      intervalRef.current = setInterval(() => {
-        setBars(
-          Array(barCount)
-            .fill(0)
-            .map(() => Math.random() * 24 + 5)
-        );
-      }, 90);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setBars(Array(barCount).fill(4));
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [active, barCount]);
-
-  return bars;
-}
-
-// ─── usePWA ───
-// Tracks PWA install state and provides install prompt.
-
-interface PWAState {
-  isOnline: boolean;
-  canInstall: boolean;
-  isStandalone: boolean;
-  promptInstall: () => Promise<void>;
-}
-
-export function usePWA(): PWAState {
-  const [isOnline, setIsOnline] = useState(true);
-  const [canInstall, setCanInstall] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const deferredPromptRef = useRef<any>(null);
-
-  useEffect(() => {
-    // Online/offline tracking
-    setIsOnline(navigator.onLine);
-    const goOnline = () => setIsOnline(true);
-    const goOffline = () => setIsOnline(false);
-    window.addEventListener("online", goOnline);
-    window.addEventListener("offline", goOffline);
-
-    // Standalone detection
-    setIsStandalone(
-      window.matchMedia("(display-mode: standalone)").matches ||
-        (window.navigator as any).standalone === true
-    );
-
-    // Install prompt
-    const handleBeforeInstall = (e: Event) => {
-      e.preventDefault();
-      deferredPromptRef.current = e;
-      setCanInstall(true);
-    };
-    window.addEventListener("beforeinstallprompt", handleBeforeInstall);
-
-    return () => {
-      window.removeEventListener("online", goOnline);
-      window.removeEventListener("offline", goOffline);
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
-    };
-  }, []);
-
-  const promptInstall = useCallback(async () => {
-    if (!deferredPromptRef.current) return;
-    deferredPromptRef.current.prompt();
-    const result = await deferredPromptRef.current.userChoice;
-    if (result.outcome === "accepted") {
-      setCanInstall(false);
-    }
-    deferredPromptRef.current = null;
-  }, []);
-
-  return { isOnline, canInstall, isStandalone, promptInstall };
-}
-
-// ─── useTranscripts ───
-// Manages saved transcripts in localStorage.
-
-import { makeStore, StorageFullError } from "@/lib/transcriptStore";
-import type { SavedTranscript } from "@/types";
-
-type SaveResult =
-  | { ok: true }
-  | { ok: false; reason: "empty" | "storage_full" | "unavailable" };
-
-export interface UseTranscriptsReturn {
-  transcripts: SavedTranscript[];
-  saveTranscript(messages: TranslationResult[]): SaveResult;
-  deleteTranscript(id: string): void;
-  storageError: string | null;
-  dismissStorageError: () => void;
-}
-
-function makeTranscript(messages: TranslationResult[]): SavedTranscript {
-  const now = new Date();
-  const weekday = now.toLocaleDateString("en-GB", { weekday: "short" });
-  const day = now.getDate();
-  const month = now.toLocaleDateString("en-GB", { month: "short" });
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const title = `Session \u2013 ${weekday} ${day} ${month}, ${hours}:${minutes}`;
-  return {
-    id: crypto.randomUUID(),
-    title,
-    savedAt: Date.now(),
-    messages,
-  };
-}
-
-let _store: ReturnType<typeof makeStore> | null = null;
-
-function getStore() {
-  if (typeof window === "undefined") return null;
-  if (!_store) _store = makeStore(window.localStorage);
-  return _store;
-}
-
-export function useTranscripts(): UseTranscriptsReturn {
-  const [transcripts, setTranscripts] = useState<SavedTranscript[]>([]);
-  const [storageError, setStorageError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const store = getStore();
-    if (!store) return;
-    try {
-      setTranscripts(store.getAll());
-    } catch {
-      setStorageError("Could not load saved transcripts");
-    }
-  }, []);
-
-  const saveTranscript = useCallback(
-    (messages: TranslationResult[]): SaveResult => {
-      if (messages.length === 0) return { ok: false, reason: "empty" };
-      const store = getStore();
-      if (!store) return { ok: false, reason: "unavailable" };
-      try {
-        store.add(makeTranscript(messages));
-        setTranscripts(store.getAll());
-        return { ok: true };
-      } catch (err) {
-        if (err instanceof StorageFullError) {
-          return { ok: false, reason: "storage_full" };
-        }
-        return { ok: false, reason: "unavailable" };
-      }
-    },
-    []
-  );
-
-  const deleteTranscript = useCallback((id: string) => {
-    const store = getStore();
-    if (!store) return;
-    try {
-      store.remove(id);
-      setTranscripts(store.getAll());
-    } catch (err) {
-      setStorageError(
-        err instanceof Error ? err.message : "Could not delete transcript"
-      );
-    }
-  }, []);
-
-  const dismissStorageError = useCallback(() => setStorageError(null), []);
-
-  return { transcripts, saveTranscript, deleteTranscript, storageError, dismissStorageError };
 }

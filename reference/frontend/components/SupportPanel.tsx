@@ -2,64 +2,111 @@
 
 import { useState, useRef, useEffect } from "react";
 import styles from "./SupportPanel.module.css";
-import { setResidentLanguageManual } from "@/lib/hearth-translation-service";
-
-function GlobeIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7a9cbd" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="12" cy="12" r="10" />
-      <ellipse cx="12" cy="12" rx="4" ry="10" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-    </svg>
-  );
-}
+import {
+  setResidentLanguageManual,
+  getResidentLanguageName,
+  getFlag,
+} from "@/lib/hearth-translation-service";
 
 const languages = [
-  { name: "Arabic",           flag: "🇸🇦", code: "ar"  },
-  { name: "Dutch",            flag: "🇳🇱", code: "nl"  },
-  { name: "English",          flag: "🇬🇧", code: "en"  },
-  { name: "French",           flag: "🇫🇷", code: "fr"  },
-  { name: "German",           flag: "🇩🇪", code: "de"  },
-  { name: "Greek",            flag: "🇬🇷", code: "el"  },
-  { name: "Hindi",            flag: "🇮🇳", code: "hi"  },
-  { name: "Indonesian",       flag: "🇮🇩", code: "id"  },
-  { name: "Italian",          flag: "🇮🇹", code: "it"  },
-  { name: "Japanese",         flag: "🇯🇵", code: "ja"  },
-  { name: "Korean",           flag: "🇰🇷", code: "ko"  },
-  { name: "Malay",            flag: "🇲🇾", code: "ms"  },
-  { name: "Mandarin Chinese", flag: "🇨🇳", code: "zh"  },
-  { name: "Polish",           flag: "🇵🇱", code: "pl"  },
-  { name: "Portuguese",       flag: "🇵🇹", code: "pt"  },
-  { name: "Punjabi",          flag: "🇮🇳", code: "pa"  },
-  { name: "Russian",          flag: "🇷🇺", code: "ru"  },
-  { name: "Spanish",          flag: "🇪🇸", code: "es"  },
-  { name: "Thai",             flag: "🇹🇭", code: "th"  },
-  { name: "Turkish",          flag: "🇹🇷", code: "tr"  },
-  { name: "Ukrainian",        flag: "🇺🇦", code: "uk"  },
-  { name: "Vietnamese",       flag: "🇻🇳", code: "vi"  },
+  { name: "Amharic",    code: "am" },
+  { name: "Arabic",     code: "ar" },
+  { name: "Basque",     code: "eu" },
+  { name: "Bengali",    code: "bn" },
+  { name: "Bulgarian",  code: "bg" },
+  { name: "Burmese",    code: "my" },
+  { name: "Catalan",    code: "ca" },
+  { name: "Chinese",    code: "zh" },
+  { name: "Croatian",   code: "hr" },
+  { name: "Czech",      code: "cs" },
+  { name: "Danish",     code: "da" },
+  { name: "Dutch",      code: "nl" },
+  { name: "English",    code: "en" },
+  { name: "Estonian",   code: "et" },
+  { name: "Finnish",    code: "fi" },
+  { name: "French",     code: "fr" },
+  { name: "Galician",   code: "gl" },
+  { name: "German",     code: "de" },
+  { name: "Greek",      code: "el" },
+  { name: "Gujarati",   code: "gu" },
+  { name: "Hausa",      code: "ha" },
+  { name: "Hebrew",     code: "he" },
+  { name: "Hindi",      code: "hi" },
+  { name: "Hungarian",  code: "hu" },
+  { name: "Igbo",       code: "ig" },
+  { name: "Indonesian", code: "id" },
+  { name: "Irish",      code: "ga" },
+  { name: "Italian",    code: "it" },
+  { name: "Japanese",   code: "ja" },
+  { name: "Javanese",   code: "jv" },
+  { name: "Khmer",      code: "km" },
+  { name: "Korean",     code: "ko" },
+  { name: "Lao",        code: "lo" },
+  { name: "Latvian",    code: "lv" },
+  { name: "Lithuanian", code: "lt" },
+  { name: "Malagasy",   code: "mg" },
+  { name: "Malay",      code: "ms" },
+  { name: "Maltese",    code: "mt" },
+  { name: "Marathi",    code: "mr" },
+  { name: "Nepali",     code: "ne" },
+  { name: "Norwegian",  code: "no" },
+  { name: "Persian",    code: "fa" },
+  { name: "Polish",     code: "pl" },
+  { name: "Portuguese", code: "pt" },
+  { name: "Punjabi",    code: "pa" },
+  { name: "Romanian",   code: "ro" },
+  { name: "Russian",    code: "ru" },
+  { name: "Serbian",    code: "sr" },
+  { name: "Shona",      code: "sn" },
+  { name: "Slovak",     code: "sk" },
+  { name: "Slovenian",  code: "sl" },
+  { name: "Spanish",    code: "es" },
+  { name: "Swahili",    code: "sw" },
+  { name: "Swedish",    code: "sv" },
+  { name: "Tagalog",    code: "tl" },
+  { name: "Tamil",      code: "ta" },
+  { name: "Telugu",     code: "te" },
+  { name: "Thai",       code: "th" },
+  { name: "Turkish",    code: "tr" },
+  { name: "Ukrainian",  code: "uk" },
+  { name: "Urdu",       code: "ur" },
+  { name: "Vietnamese", code: "vi" },
+  { name: "Welsh",      code: "cy" },
+  { name: "Wolof",      code: "wo" },
+  { name: "Xhosa",      code: "xh" },
+  { name: "Yoruba",     code: "yo" },
+  { name: "Zulu",       code: "zu" },
 ];
 
+// Conversation Starters category icon
 function ChatIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" /></svg>;
 }
+// Needs category icon
 function HomeIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>;
 }
+// Safety category icon
 function ShieldIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" /></svg>;
 }
+// Wellbeing category icon
 function HeartIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>;
 }
+// Family category icon
 function FamilyIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>;
 }
+// Health category icon
 function HealthIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" /></svg>;
 }
+// Resources category icon
 function ResourcesIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" /></svg>;
 }
+// Comfort category icon
 function ComfortIcon() {
   return <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" aria-hidden><path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z" /></svg>;
 }
@@ -217,9 +264,10 @@ interface SupportPanelProps {
   onSelect: (text: string) => void;
 }
 
+// Support-prompt category browser with a resident-language selector
 export function SupportPanel({ onSelect }: SupportPanelProps) {
   const [selected, setSelected] = useState<Category | null>(null);
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState(() => getResidentLanguageName() ?? "");
   const [langError, setLangError] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -227,6 +275,7 @@ export function SupportPanel({ onSelect }: SupportPanelProps) {
   const selectedLang = languages.find((l) => l.name === language) ?? null;
 
   useEffect(() => {
+    // Close the language dropdown when a click lands outside of it
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
@@ -236,13 +285,24 @@ export function SupportPanel({ onSelect }: SupportPanelProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Stay in sync with the persisted resident language (e.g. cleared via "New session")
+  // even while this panel stays mounted across tab switches
+  useEffect(() => {
+    const id = setInterval(() => {
+      setLanguage(getResidentLanguageName() ?? "");
+    }, 500);
+    return () => clearInterval(id);
+  }, []);
+
+  // Persist the manually chosen resident language and dismiss the dropdown
   function handleLanguageSelect(lang: typeof languages[0]) {
     setLanguage(lang.name);
     setLangError(false);
     setDropdownOpen(false);
-    setResidentLanguageManual(lang.name, lang.code, lang.flag);
+    setResidentLanguageManual(lang.name, lang.code, getFlag(lang.code));
   }
 
+  // Forward the selected prompt to the parent, blocking until a language is chosen
   function handlePromptClick(item: string) {
     if (!language) {
       setLangError(true);
@@ -267,8 +327,7 @@ export function SupportPanel({ onSelect }: SupportPanelProps) {
           aria-haspopup="listbox"
           aria-expanded={dropdownOpen}
         >
-          {!selectedLang && <GlobeIcon />}
-          <span>{selectedLang ? <>{selectedLang.flag}&nbsp;&nbsp;{selectedLang.name}</> : "Language"}</span>
+          <span>{selectedLang ? selectedLang.name : "Language"}</span>
         </button>
 
         {dropdownOpen && (
@@ -281,7 +340,7 @@ export function SupportPanel({ onSelect }: SupportPanelProps) {
                 className={`${styles.langOption} ${l.name === language ? styles.langOptionActive : ""}`}
                 onClick={() => handleLanguageSelect(l)}
               >
-                {l.flag}&nbsp;&nbsp;{l.name}
+                {l.name}
               </li>
             ))}
           </ul>
