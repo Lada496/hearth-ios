@@ -45,7 +45,7 @@ Returning users skip onboarding but still reach landing before model preparation
   underlying `Font.custom` includes `relativeTo:`. The current design system has scalable
   body roles but not every large title/CTA role shown in the gap images. The design-system
   owner must add or approve those scalable roles before implementation; do not fall back to
-  fixed `FontHearth.languageBadge`, `ctaButton`, or `errorToast` values.
+  fixed `FontHearth.languageBadge`, `FontHearth.ctaButton`, or `FontHearth.errorToast` values.
 - **Localization-ready copy.** The August build uses the exact English literals below. Each
   complete string remains a single `LocalizedStringKey`-compatible literal; do not assemble
   sentences from fragments.
