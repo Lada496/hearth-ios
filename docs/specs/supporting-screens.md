@@ -1,324 +1,374 @@
 # Supporting Screens and Error Copy Specification
 
-Status: draft, pending human approval (see Acceptance below).
+Status: draft, pending human approval (see Acceptance).
 
 Issue: https://github.com/Lada496/hearth-ios/issues/23
 
 Sprint task: `docs/sprints/sprint-1.md` task 1.7
 
-Depends on: the rebaselined `docs/PRD.md` and `docs/adr/ADRs.md`.
-Blocks: [#24](https://github.com/Lada496/hearth-ios/issues/24) (device gate),
-[#28](https://github.com/Lada496/hearth-ios/issues/28) (model preparation/retry UX),
-[#29](https://github.com/Lada496/hearth-ios/issues/29) (onboarding),
-[#30](https://github.com/Lada496/hearth-ios/issues/30) (Settings/About/Privacy/Attribution).
+Depends on: `docs/PRD.md`, `docs/adr/ADRs.md`, and the August UI reference pack.
+Blocks: [#24](https://github.com/Lada496/hearth-ios/issues/24),
+[#28](https://github.com/Lada496/hearth-ios/issues/28),
+[#29](https://github.com/Lada496/hearth-ios/issues/29), and
+[#30](https://github.com/Lada496/hearth-ios/issues/30).
 
-This is a spec-only document. It defines copy, layout, navigation, and accessibility contracts
-for screens/states not yet covered by `docs/design/UI-SPEC.md`. **No Swift files, assets,
-dependencies, persistence, or model code are introduced here.**
+This is a spec-only document. It introduces no Swift files, assets, dependencies,
+persistence, or model code.
 
-## Cross-cutting rules
+## Visual authority and approved flow
 
-These apply to every state below:
+`docs/design/august-ui/README.md` and the images it maps to issue #23 are the visual source
+of truth. Copy, actions, hierarchy, and navigation below intentionally match those images.
+An implementation must not silently substitute a different screen or omit an action. A
+proposed divergence requires human approval and an updated reference image first.
 
-- **No supported-language claims.** No screen may list, imply, or count supported/launch
-  languages, show tier badges, or suggest translation-quality guarantees (PRD §3, §5).
-- **No accounts, network, or download UI.** No sign-in, network-status indicators, download
-  progress for remote content, or links to external services (AGENTS.md rule 1; PRD §6).
-- **No transcript history.** No screen may reference saving, viewing, or exporting past
-  conversation content (ADR-006).
-- **Tokens only.** All colors/fonts/radii/shadows come from `Hearth/DesignSystem/` token
-  files (`Color+Hearth`, `FontHearth`/`TypographyHearth`, `RadiusHearth`, `ShadowHearth`).
-  No screen in this spec introduces a new token; if a needed value doesn't exist yet, flag it
-  for human review rather than hard-coding it.
-- **Localization placeholder policy.** All user-facing strings are plain English `String`
-  literals for the August build (no `.strings`/`String Catalog` infrastructure exists yet).
-  Every literal must be a single `Text("...")` call or a `LocalizedStringKey`-compatible
-  literal so a future localization pass is a mechanical string-catalog migration, not a
-  rewrite. No string concatenation of copy fragments.
-- **Reduced motion.** Wherever this spec calls for a fade/scale/pulse animation, that
-  animation must be skipped (state should appear instantly) when
-  `UIAccessibility.isReduceMotionEnabled` is true.
-- **Touch targets.** Every tappable control is at least 44×44 pt, per PRD §6.
-- **Dynamic Type.** Worker-facing text (all screens in this spec are worker-facing, not
-  rotated) scales with the system content size category; use `Font.custom(_:size:relativeTo:)`
-  or `TypographyToken`-based `.hearthTypography(_:)`, never a fixed unscaled size.
+The approved first-launch sequence from `flow-01-first-launch.png` is:
 
----
+1. Launch and evaluate the device capability gate before model work.
+2. Unsupported devices show the terminal unsupported-device path.
+3. Supported first launches show onboarding, then landing.
+4. Model preparation begins only after the worker taps **Start conversation** on landing.
+5. Successful preparation enters the conversation screen.
+
+Returning users skip onboarding but still reach landing before model preparation.
+
+## Cross-cutting implementation rules
+
+- **No supported-language claims.** Do not list, imply, or count supported languages, show
+  tier badges, or claim translation quality (PRD §§3 and 5).
+- **No accounts, networking, or downloads.** Do not add sign-in, connectivity indicators,
+  remote-download progress, analytics, or external-service links.
+- **No transcript history.** Conversation content remains in memory only (ADR-006).
+- **Tokens only.** Colors, typography, spacing, radii, material, and shadows come from
+  `Hearth/DesignSystem/`. Do not hard-code visual constants in feature views.
+- **Dynamic Type gate.** Every worker-facing text role must use a `TypographyToken` whose
+  underlying `Font.custom` includes `relativeTo:`. The current design system has scalable
+  body roles but not every large title/CTA role shown in the gap images. The design-system
+  owner must add or approve those scalable roles before implementation; do not fall back to
+  fixed `FontHearth.languageBadge`, `ctaButton`, or `errorToast` values.
+- **Localization-ready copy.** The August build uses the exact English literals below. Each
+  complete string remains a single `LocalizedStringKey`-compatible literal; do not assemble
+  sentences from fragments.
+- **Reduced motion.** Replace fades, slides, pulses, and page transitions with immediate
+  state changes when Reduce Motion is enabled. Preserve all information and controls.
+- **Touch targets.** Every control is at least 44×44 pt.
+- **Screen shell.** Worker-facing screens use `Color.Hearth.bodyBehindShell` behind a centered
+  shell no wider than 420 pt. The shell uses `Color.Hearth.cream`; cards alternate existing
+  `sandLight`/cream-family surfaces as shown in the reference images.
 
 ## 1. Unsupported-device screen
 
-**Source:** ADR-005 (6 GB RAM / iOS 17.0+ floor).
+**Reference:** `gap-04-unsupported-device.png`, `flow-01-first-launch.png`.
 
-### Entry/exit
+### Entry, exit, and navigation
 
-- Entry: app launch, before any model preparation begins, when the device fails the ADR-005
-  RAM check. This is the *only* entry point — the screen is never reachable via in-app
-  navigation.
-- Exit: none. This is a terminal screen for the session; the only affordance is to close the
-  app. There is no "continue anyway" or "try again" — the device genuinely cannot run the
-  model (ADR-005: "app memory ceiling ~2 GB cannot hold Whisper + LLM").
+- Enter at launch when the ADR-005 memory check fails, before onboarding or model loading.
+- The user cannot continue to landing or conversation.
+- **About Hearth** opens the same About & attribution content specified in §4, then returns
+  to this screen. Closing the app is the only session exit.
 
-### Copy
+### Exact copy
 
-- Title: **"This device isn't supported yet"**
-- Body: **"Hearth needs more memory than this iPhone has to run its translation model
-  fully offline. Nothing was downloaded or changed on your device."**
-- No specific RAM number, model name, or device-model list is shown to the user (avoids
-  a stale hard-coded device list going out of date; App Store listing carries the
-  authoritative requirement per ADR-005).
+- Navigation title: **"Unsupported device"**
+- Title: **"This iPhone cannot run Hearth safely"**
+- Body: **"Hearth needs at least 6 GB of memory to keep translation private and on this
+  device."**
+- Requirement card: **"Supported: iPhone 12 Pro and newer qualifying models."**
+- Button: **"About Hearth"**
 
-### Layout
+The memory and device wording is a product promise and requires explicit human approval before
+issue #24 begins. It mirrors the approved image and ADR-005; implementation must derive the
+gate from memory capability rather than parsing this display string or maintaining a view-level
+device list.
 
-- Full-screen, `Color.Hearth.cream` background, centered content, matches the landing
-  screen's shell chrome (no tab bar, no back button).
-- A single centered icon (SF Symbol, e.g. `exclamationmark.triangle`, tinted
-  `Color.Hearth.text`) above the title.
-- Title: reuse `FontHearth.languageBadge` (Nunito 700, 22 pt) — no new token needed, this is
-  the closest existing "short, centered, bold statement" role. Body: `TypographyHearth.appBodyRegular`.
-- No buttons. No CTA. This is intentionally a dead-end screen.
+### Layout and accessibility
 
-### Accessibility
+- Center the device-with-x icon, title, body, requirement card, and secondary button in the
+  order shown. The icon is decorative and hidden from VoiceOver.
+- VoiceOver order: navigation title → title (`.isHeader`) → body → requirement → About Hearth.
+- Allow the title, body, and card to grow vertically at accessibility text sizes without
+  clipping or covering the button.
 
-- VoiceOver reads the icon as decorative (`.accessibilityHidden(true)`), then title, then
-  body, as one combined accessibility element in `.staticText`/`.header` traits order:
-  title first (`.isHeader`), then body.
-- Dynamic Type applies to both title and body.
-- No reduced-motion concern (static screen, no entry animation beyond the standard 0.2s
-  screen-transition fade already defined in UI-SPEC §5).
+### Acceptance
 
-### Screenshot acceptance size
+- Screenshot: iPhone 16 portrait, 393×852 pt, compared with
+  `gap-04-unsupported-device.png` using an injected unsupported capability.
+- Human device check for #24: verify the supported path on a supported iPhone and the blocked
+  path on an actual unsupported iPhone when one is available; otherwise record that the
+  unsupported physical-device check remains outstanding.
+- VoiceOver and largest accessibility Dynamic Type preview must preserve the reading order and
+  all copy/actions.
 
-- iPhone 16 (393×852 pt) simulator preview only. No physical-device verification is possible
-  for this specific screen: it only renders on devices ADR-005 excludes from the supported
-  list, so there is no supported device to test it on. Simulator preview is the acceptance
-  bar here, as an exception to the usual physical-device requirement.
+## 2. Model preparation, retry, and unavailable states
 
----
+**References:** `gap-05-model-preparing.png`, `gap-06-model-failure.png`,
+`gap-07-model-unavailable.png`, `flow-01-first-launch.png`.
 
-## 2. Model preparation / retryable load failure / unavailable-model states
+These states are entered only after **Start conversation**. Settings remains reachable during
+preparation and failure. Returning to landing does not retain conversation content.
 
-**Source:** PRD §4 item 6 ("Loading, processing, empty-input, permission, and recoverable-
-error states"), Sprint 3 task 3.4, Sprint 5 task 5.1's onboarding boundary.
+### 2a. Preparing private translation
 
-Three distinct states, all reachable only between the supported-device check succeeding and
-the conversation screen becoming interactive:
+**Entry/exit**
 
-### 2a. Preparing (loading)
+- Enter when model preparation starts after **Start conversation**.
+- Success enters the empty conversation screen.
+- **Settings** opens Settings while preparation remains the current app state; returning shows
+  the latest preparation state.
 
-- Entry: app has passed the device gate and is loading WhisperKit + Tiny-Aya model
-  resources into memory.
-- Exit: automatic, to the conversation/landing flow, once both engines report ready.
-- Copy: **"Getting ready…"** — no percentage, no ETA, no model name. Avoids a promise the
-  loading step can't keep (model prep time is device-dependent, PRD §6 performance note is
-  about the conversation loop, not first load).
-- Layout: centered `ProgressView()` (indeterminate spinner, tinted `Color.Hearth.warmth`)
-  above the copy, `Color.Hearth.cream` background.
-- Motion: spinner is the standard system indeterminate spin; respects
-  `isReduceMotionEnabled` by falling back to a static "Getting ready…" with no spinner
-  animation (a plain non-animating glyph) when reduced motion is on — SwiftUI's
-  `ProgressView` does not fully honor reduce-motion on its own, so this must be an explicit
-  check in the implementing view.
-- VoiceOver: announces **"Getting ready, please wait"** once via
-  `.accessibilityAddTraits(.updatesFrequently)` so it isn't re-announced on every frame.
+**Exact copy**
 
-### 2b. Retryable load failure
+- Eyebrow: **"Getting ready"**
+- Title: **"Preparing private translation"**
+- Body: **"Checking the speech and translation models bundled with Hearth."**
+- Privacy note: **"Everything stays on this iPhone."**
+- Button: **"Settings"**
 
-- Entry: model loading throws (e.g. corrupted bundled resource, out-of-memory during load).
-- Exit: user taps **Retry**, returning to 2a; or the user backgrounds/force-quits the app
-  (no other exit — there is no "continue without models" path since the app has no
-  functionality without them).
-- Copy:
-  - Title: **"Couldn't get ready"**
-  - Body: **"Something went wrong preparing Hearth. Try again, or restart the app if this
-    keeps happening."**
-  - Button: **"Retry"**
-- Layout: same shell as 2a, icon (`exclamationmark.triangle`, `Color.Hearth.text`) replaces
-  the spinner, `Retry` is a pill button using the existing CTA style
-  (`RadiusHearth.pill`, `FontHearth.ctaButton`, `Color.Hearth.warmth` fill,
-  `Color.Hearth.textOnWarmth` label) at minimum 44×44 pt.
-- VoiceOver: title (`.isHeader`) → body → Retry button, standard focus order top-to-bottom.
-- This state does not name which engine failed (WhisperKit vs. Tiny-Aya) — that distinction
-  is diagnostic detail, not something the user needs to act on differently.
+**Layout and behavior**
 
-### 2c. Unavailable model (non-retryable)
+- Show the three processing dots above the title. Hide their animation for Reduce Motion.
+- Show determinate progress only when the preparation layer reports a real fraction. When it
+  cannot, omit the filled progress fraction and keep the dots/labels indeterminate; never
+  synthesize a percentage or ETA from elapsed time.
+- VoiceOver announces **"Preparing private translation. Please wait."** once on entry. The
+  progress control exposes its value only when real progress exists.
 
-- Entry: reserved for a case where retry cannot possibly help (e.g. the app bundle itself is
-  missing a required resource — a build/packaging defect, not a transient failure). This is
-  expected to be rare/never hit in the August build since models are bundled at build time,
-  but the state is specified so the ViewModel layer has a defined terminal error rather than
-  an infinite retry loop.
-- Copy:
-  - Title: **"Hearth can't start"**
-  - Body: **"A required file is missing from this install. Reinstalling the app may fix
-    this."**
-  - No Retry button (retrying a missing bundled resource cannot succeed).
-- Layout: same shell as 2b, minus the Retry button.
-- VoiceOver: title → body, same pattern as 2b.
+### 2b. Retryable translator failure
 
----
+**Entry/exit**
 
-## 3. Onboarding (three pages or fewer)
+- Enter when preparation fails with a condition that may succeed on retry.
+- **Try again** returns to §2a. **Settings** opens model status. **Back** returns to landing.
 
-**Source:** Sprint 5 task 5.1 ("Add at most three icon-led pages for hold-to-talk,
-pass-the-phone, and offline privacy. Store only the onboarding-seen flag.")
+**Exact copy**
 
-### Entry/exit
+- Navigation title: **"Translator"**
+- Back label: **"Back"**
+- Title: **"Hearth could not prepare the translator"**
+- Body: **"Nothing left this phone. Try again, or open Settings to review the model status."**
+- Primary button: **"Try again"**
+- Secondary button: **"Settings"**
 
-- Entry: first launch only (no onboarding-seen flag in `UserDefaults`), after the device
-  gate and model-preparation succeed, before the landing screen.
-- Exit: tapping "Get started" on the final page sets the onboarding-seen flag
-  (`UserDefaults`, per ADR-006's explicit allow-list) and navigates to the landing screen.
-  Onboarding never reappears after that, with no in-app way to replay it in the August build
-  (Settings does not get a "replay onboarding" affordance — out of scope per Sprint 5 task
-  5.2's minimal Settings scope).
+The failure icon is decorative. VoiceOver order is Back → navigation title → title (`.isHeader`)
+→ body → Try again → Settings. Move VoiceOver focus to the title when the state appears.
 
-### Pages (exactly three, one concept each)
+### 2c. Translation unavailable
 
-1. **Hold-to-talk** — icon: mic glyph (reuse conversation screen's mic iconography style).
-   Copy: **"Hold the mic button and speak. Let go when you're done."**
-2. **Pass-the-phone** — icon: phone-rotate glyph. Copy: **"Hand the phone across. The other
-   person's side is upside-down on purpose — it faces them correctly."**
-3. **Offline privacy** — icon: lock/wifi-slash glyph. Copy: **"Everything happens on this
-   phone. Nothing is recorded, saved, or sent anywhere."**
+**Entry/exit**
 
-Each page is a full-screen `Color.Hearth.cream` view: icon, then title-less body copy in
-`TypographyHearth.appBodyRegular`, paged via a `TabView(.page)` style, no page indicator
-text (dots use standard SwiftUI page control, tinted `Color.Hearth.warmth` for the active
-dot). Final page adds a **"Get started"** pill CTA button (same CTA styling as §2b's Retry).
-Pages 1-2 have no button — swipe or the standard page-dot navigation advances.
+- Enter when the bundled translation model cannot start and retry cannot safely recover.
+- **Return to start** goes to landing. **About this build** opens About & attribution.
+  **Back** also returns to landing. Conversation is not entered.
 
-### Accessibility
+**Exact copy**
 
-- Each page is a single VoiceOver "page" — swipe-right/left (or the standard
-  `TabView(.page)` accessibility rotor) moves between pages; icon is decorative
-  (`.accessibilityHidden(true)`).
-- "Get started" is only focusable on page 3, 44×44 pt minimum.
-- Reduced motion: page transitions use `.animation(nil)` fallback (no slide animation) —
-  content still changes, just without the animated transition.
+- Navigation title: **"Translator"**
+- Back label: **"Back"**
+- Title: **"Translation is unavailable"**
+- Body: **"This build cannot start its bundled translation model on this iPhone.
+  Conversation cannot continue safely."**
+- Primary button: **"Return to start"**
+- Secondary button: **"About this build"**
 
-### Screenshot acceptance size
+The device-with-x icon is decorative. VoiceOver order is Back → navigation title → title
+(`.isHeader`) → body → Return to start → About this build.
 
-- iPhone 16 (393×852 pt), portrait only (onboarding is worker-facing setup, not the rotated
-  resident pane, so no landscape/rotated variant is needed).
+### Model-state acceptance
 
----
+| State | Preview size | Visual reference |
+|---|---|---|
+| Preparing | iPhone 16 portrait, 393×852 pt | `gap-05-model-preparing.png` |
+| Retryable failure | iPhone 16 portrait, 393×852 pt | `gap-06-model-failure.png` |
+| Unavailable | iPhone 16 portrait, 393×852 pt | `gap-07-model-unavailable.png` |
 
-## 4. Settings / About / Privacy / Attribution
+Each state must also pass VoiceOver order, largest accessibility Dynamic Type without clipped
+actions, and Reduce Motion checks. A human verifies real model transitions on a supported iPhone
+under issue #28; previews may inject each state without model files.
 
-**Source:** Sprint 5 task 5.2 ("Add privacy, model/library/font attributions, and device
-information. Do not show a supported language list or tier badges before the language
-decision.")
+## 3. Onboarding
 
-### Entry/exit
+**References:** `gap-01-onboarding-hold.png`, `gap-02-onboarding-pass.png`,
+`gap-03-onboarding-privacy.png`, `flow-01-first-launch.png`.
 
-- Entry: a Settings entry point from the landing screen (icon button, top corner — exact
-  placement matches `docs/design/screenshots/landing.png` chrome where present, otherwise a
-  single top-trailing gear icon at 44×44 pt tap target).
-- Exit: a close/back control (top-leading, standard `chevron.left` or `xmark`, 44×44 pt)
-  returns to landing. This is a `.sheet` presentation, consistent with §4e's Language sheet
-  pattern in `UI-SPEC.md`.
+### Entry, exit, and replay
 
-### Sections and copy
+- On first supported launch, enter after the device gate and before landing. Do not prepare
+  models during onboarding.
+- Completing page 3 sets only the onboarding-seen flag and opens landing.
+- Settings row **Show onboarding again** replays all three pages. Completing a replay returns
+  to landing and leaves the already-set flag unchanged.
 
-1. **Privacy** — static text, no toggles (there is nothing to opt in/out of since there's no
-   networking to begin with): **"Hearth doesn't collect, store, or send any conversation
-   content. Everything runs on this device. Ending a session — or leaving the app in the
-   background for more than five minutes — clears the conversation."**
-2. **About** — app name, version/build number (from `Bundle.main`, read at render time —
-   not hard-coded), one-line description: **"Hearth helps a shelter worker and a resident
-   communicate, powered by on-device translation."**
-3. **Attributions** — a plain list, no links out: model name(s) (Tiny-Aya Earth, WhisperKit)
-   with their license names only (no full license text inline; if a human wants full license
-   text shown, that's a separate follow-up, not this spec), plus Nunito and Playfair Display
-   font attributions (both are open-license Google Fonts — name + license name only, e.g.
-   "Nunito — SIL Open Font License 1.1").
-4. **Device information** — read-only, diagnostic only: iOS version, device model identifier,
-   available RAM tier (e.g. "6 GB+") — no networking, no telemetry sent anywhere; this is
-   displayed locally for the user/support-desk's own troubleshooting reference only.
+### Exact pages
 
-### What is deliberately absent
+| Page | Title | Body | Action |
+|---|---|---|---|
+| 1 | **"Hold to speak"** | **"Keep your finger on the microphone while you talk. Release when you are finished."** | **"Next"** |
+| 2 | **"Pass the phone"** | **"The resident reads the top half. You read the bottom half. Each side has its own microphone."** | **"Next"** |
+| 3 | **"Private by design"** | **"Hearth works offline. Conversations are never saved and are cleared when you end or leave a session."** | **"Continue to Hearth"** |
 
-- No supported-language list or tier badges (explicit PRD §5/§3 deferral).
-- No "manage account" / sign-in — there are no accounts.
-- No network/connectivity status row (app has no network code to report on).
-- No transcript/history section or "clear data now" button — there is nothing persisted to
-  clear (ADR-006); the only content-bearing state is the live conversation, which Settings
-  does not touch.
+The privacy page deliberately says **never saved**, not **nothing is recorded**: hold-to-talk
+temporarily captures audio for on-device speech recognition, while ADR-006 prohibits persistence.
 
-### Layout
+### Layout and accessibility
 
-- Grouped-list style (`List` with `.insetGrouped` or a custom card list matching
-  `RadiusHearth.card` on each section container), `Color.Hearth.cream` background,
-  `Color.Hearth.text` body text via `TypographyHearth.appBodyRegular`, section headers via
-  `TypographyHearth.appBodySemibold`.
+- Match the icon-led hierarchy and bottom CTA in each reference image. Pages support both the
+  CTA and horizontal swipe navigation.
+- Show the three-dot position indicator. Expose it to VoiceOver as **"Page 1 of 3"**, etc.,
+  rather than reading three punctuation marks.
+- On each page, VoiceOver reads title (`.isHeader`) → body → page position → action. Decorative
+  icons are hidden because the adjacent title supplies the same meaning.
+- With Reduce Motion, page changes are immediate; focus moves to the next page title.
 
-### Accessibility
+### Acceptance
 
-- Each section header uses `.isHeader` trait.
-- Close button has an explicit `.accessibilityLabel("Close settings")` (an icon-only button
-  otherwise reads as an unlabeled glyph).
-- Device-information values are read as `"iOS version, 26.5"` style label+value pairs, not
-  bare numbers.
+- Capture all three pages at iPhone 16 portrait, 393×852 pt, and compare with their respective
+  `gap-01`, `gap-02`, and `gap-03` images.
+- At the largest accessibility Dynamic Type size, body copy may scroll but the CTA remains
+  reachable and no copy is truncated.
+- Verify first-launch completion, launch-after-completion, and Settings replay paths.
 
-### Screenshot acceptance size
+## 4. Settings, Privacy, About, and attribution
 
-- iPhone 16 (393×852 pt) portrait, sheet presentation at full height.
+**References:** `gap-13-settings.png`, `gap-14-privacy.png`,
+`gap-15-about-attribution.png`.
 
----
+### Navigation
 
-## 5. Shared recoverable-error wording (ConversationViewModel)
+- Landing exposes the top-trailing Settings control shown in `prototype-01-landing.png`.
+- Settings is a full-screen worker-facing navigation destination, not a language sheet.
+- Back returns to the screen that opened Settings. Privacy and About & attribution are pushed
+  from Settings and their Back controls return to Settings.
+- Model preparation/failure may deep-link to Settings with the same Back behavior.
 
-**Source:** `Hearth/Features/Conversation/ConversationViewModel.swift` (issue #9,
-`feat/conversation-viewmodel`), PRD §4 item 6.
+### Settings screen
 
-This section documents the copy contract the ViewModel already implements, so future engine
-work maps new failure cases onto the same tone/format rather than inventing new patterns.
+Rows appear in this order:
 
-### Existing strings (frozen contract — reuse this phrasing family for new cases)
+1. **Model status** with a read-only runtime value: **Ready**, **Preparing**, **Needs attention**,
+   or **Unavailable**. The view does not infer status from time or network state.
+2. **Privacy** → Privacy screen.
+3. **About & attribution** → About screen.
+4. **Show onboarding again** → onboarding page 1.
 
-| Source error | User-facing copy |
+Footer card copy:
+
+- Title: **"Offline by default"**
+- Body: **"No accounts · No analytics · No saved conversations"**
+
+### Privacy screen exact copy
+
+- Navigation title: **"Privacy"**
+- Title: **"Privacy is the product"**
+- Statements, in order:
+  1. **"Works without a network connection"**
+  2. **"Conversation text stays in memory only"**
+  3. **"End Session clears everything immediately"**
+  4. **"Background sessions clear after five minutes"**
+  5. **"Hearth does not collect data"**
+
+The lock and row icons are decorative. VoiceOver reads the navigation title, title as a header,
+then each complete statement from top to bottom.
+
+### About & attribution screen exact copy
+
+- Navigation title: **"About"**
+- App title: **"Hearth"**
+- Description: **"Private, on-device translation for face-to-face conversations."**
+- Attribution cards:
+  - **"Tiny-Aya Earth"** — **"Provisional local translation · CC BY-NC 4.0"**
+  - **"WhisperKit"** — **"On-device speech recognition · MIT"**
+  - **"llama.cpp Swift bindings"** — **"Local translation runtime · MIT"**
+  - **"Nunito & Playfair Display"** — **"Interface fonts · SIL Open Font License"**
+- Model-use note: **"Tiny-Aya Earth use is also subject to the Cohere Labs Acceptable Use
+  Policy."**
+- Quality note: **"Translation quality is not yet approved for any launch language."**
+
+The llama.cpp card and clarified Tiny-Aya license note extend `gap-15-about-attribution.png` to
+satisfy Sprint 5 task 5.2's complete attribution requirement. A human must re-check every
+displayed license, acceptable-use term, and dependency notice against the exact bundled revisions
+before release.
+
+Below the attribution cards, include a **Device information** section in the same card style:
+
+- **"App version"** — `CFBundleShortVersionString` plus build number.
+- **"iOS version"** — current local system version.
+- **"Device"** — local device model identifier.
+- **"Memory tier"** — locally computed capability tier, such as **"6 GB or more"**.
+
+These values are displayed locally and are never transmitted. VoiceOver reads each as a single
+label/value pair. Do not expose a hardware serial number or other unique identifier.
+
+### Deliberately absent
+
+- No supported-language list, language tiers, or quality claim.
+- No account, analytics, connectivity, download, or external-service controls.
+- No transcript/history, export, or persisted-conversation clearing controls.
+- No full license text is invented in the view; bundled license obligations remain a human
+  release check.
+
+### Settings acceptance
+
+| Screen | Preview size | Visual reference |
+|---|---|---|
+| Settings | iPhone 16 portrait, 393×852 pt | `gap-13-settings.png` |
+| Privacy | iPhone 16 portrait, 393×852 pt | `gap-14-privacy.png` |
+| About, top | iPhone 16 portrait, 393×852 pt | `gap-15-about-attribution.png` |
+| About, device information | iPhone 16 portrait, 393×852 pt, scrolled | same visual language |
+
+All screens must pass largest accessibility Dynamic Type with vertical scrolling, VoiceOver
+order/labels, Reduce Motion, and 44 pt target checks.
+
+## 5. Shared recoverable conversation errors
+
+**References:** `prototype-07-recoverable-error.png`, `flow-03-recovery-privacy.png`, and the
+ConversationViewModel from issue #9.
+
+### Copy contract
+
+| Source | User-facing copy |
 |---|---|
-| `SpeechToTextError.notPrepared` | "Still getting ready. Please wait a moment and try again." |
-| `SpeechToTextError.audioTooShort` | "That was too short to hear. Hold the button and speak." |
-| `SpeechToTextError.transcriptionFailed` | "Couldn't understand that. Please try again." |
-| `TranslationError.notPrepared` | "Still getting ready. Please wait a moment and try again." |
-| `TranslationError.emptyInput` | "Nothing to translate." |
-| `TranslationError.translationFailed` | "Couldn't translate that. Please try again." |
-| Unresolved resident language (typed worker reply before any resident speech) | "We don't know the resident's language yet. Have them speak first." |
-| Unclassified/unexpected error | "Something went wrong understanding that. Please try again." / "Something went wrong sending that. Please try again." |
+| `SpeechToTextError.notPrepared` | **"Still getting ready. Please wait a moment and try again."** |
+| `SpeechToTextError.audioTooShort` | **"That was too short to hear. Hold the button and speak."** |
+| `SpeechToTextError.transcriptionFailed` | **"Couldn't understand that. Please try again."** |
+| `TranslationError.notPrepared` | **"Still getting ready. Please wait a moment and try again."** |
+| `TranslationError.emptyInput` | **"Nothing to translate."** |
+| `TranslationError.translationFailed` | **"Couldn't translate that. Please try again."** |
+| Resident language unknown | **"We don't know the resident's language yet. Have them speak first."** |
+| Unclassified turn failure | **"Translation paused. Please try that turn again."** |
 
-### Copy conventions to preserve for any new error case
+New recoverable errors use plain language, state the next action, avoid blame/jargon, and stay
+within two sentences. Engine names and error types never appear in conversation copy.
 
-1. **Plain sentence, no jargon.** Never surface an engine/type name (`SpeechToTextError`,
-   `TranslationError`, `WhisperKit`, `Tiny-Aya`) to the user.
-2. **State what to do next**, not just what went wrong, whenever an action exists ("Please
-   try again", "Have them speak first", "Hold the button and speak").
-3. **No blame, no alarm.** No exclamation points, no "Error:" prefix, no red-alert framing —
-   matches the PRD's broader stance (see the harmful-language-detection exclusion in
-   UI-SPEC.md: "no alert, no SMS, no blocking message") that Hearth avoids scary/blocking UI
-   even for recoverable failures.
-4. **Two sentences max.** Keeps the toast readable at the existing `errorToast` type size
-   (13pt) within the toast's layout.
+### Presentation and behavior
 
-### Presentation (already defined in UI-SPEC.md, referenced here for completeness)
+- Present the error as the retained toast in `prototype-07-recoverable-error.png`: top-center
+  within the worker pane, `Color.Hearth.errorBg`, white scalable error typography,
+  `RadiusHearth.toast`, maximum width 300 pt.
+- Tapping the toast calls `dismissError()`. A successful retry or new turn also clears stale
+  error copy. No automatic dismissal timer is defined.
+- With motion enabled, use the UI-SPEC 0.3 s fade and 8 pt downward entry. With Reduce Motion,
+  show it immediately.
+- Post a VoiceOver announcement when `error` changes from `nil` to a value, then keep normal
+  focus on the current conversation control. Do not rely on `.updatesFrequently` to announce
+  an off-focus toast.
 
-- Rendered as a toast per UI-SPEC.md §4: floats top-center (top ≈ 80pt), `Color.Hearth.errorBg`
-  background, white `FontHearth.errorToast` text, `RadiusHearth.toast` corners, max-width
-  300pt, slides down 8pt + fades in over 0.3s, tap anywhere on the toast to dismiss.
-- Dismissal: tapping the toast calls the `dismissError()` intent, clearing `error`. No
-  auto-dismiss timer is specified here (if product wants one, that's a follow-up decision,
-  not assumed by this spec).
-- VoiceOver: the toast must be announced via
-  `UIAccessibility.post(notification: .announcement, argument:)` or an
-  `.accessibilityAddTraits(.updatesFrequently)` live region when `error` transitions from
-  `nil` to non-`nil`, since it's not the currently-focused element when it appears.
+### Acceptance
 
----
+- Screenshot: iPhone 16 portrait, 393×852 pt, compared with
+  `prototype-07-recoverable-error.png` using the generic unclassified copy.
+- Preview every table row at standard and largest accessibility Dynamic Type; the toast may
+  grow vertically but must not obscure the microphone or text-input controls.
+- Verify tap-to-dismiss, retry clearing, VoiceOver announcement, and Reduce Motion behavior.
 
 ## Acceptance
 
-- [ ] All five sections above have unambiguous state, copy, layout, and accessibility
-      requirements (this document).
-- [ ] Copy makes no supported-language, device-list, or accuracy claim (see per-section
-      notes above).
-- [ ] A human approves this spec before implementation tickets (#24, #28, #29, #30) begin.
+- [ ] All five areas have unambiguous entry/exit, copy, visual hierarchy, navigation,
+      accessibility behavior, and preview acceptance.
+- [ ] Copy and actions match the mapped August reference images, except the explicitly noted
+      attribution and license clarifications.
+- [ ] Copy makes no supported-language or translation-accuracy claim.
+- [ ] A human approves the device, privacy, and quality wording.
+- [ ] A human verifies displayed dependency/model/font licenses against bundled revisions.
+- [ ] Scalable supporting-screen typography roles are approved in the design system before
+      implementation tickets begin.
+- [ ] Human approval is recorded before #24, #28, #29, or #30 begins.
