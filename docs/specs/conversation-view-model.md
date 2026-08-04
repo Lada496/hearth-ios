@@ -71,7 +71,7 @@ Replay is viewer-relative because each pane presents the same turn from a differ
 - If the viewer is the message speaker, replay the original text in the source language.
 - Otherwise replay the translated text in the target language.
 - Call `TextToSpeech.supports` before playback. When unsupported, do not call `speak`; keep the
-  large translated text visible and expose the text-only state to the view.
+  large on-screen text visible and expose the text-only state to the view.
 - When supported, set `playingMessageID`, set `.speaking(message.speaker)`, await `speak`, then
   clear the ID and return to `.idle` whether playback succeeds or fails.
 - A playback failure is recoverable and does not alter messages or session language.
