@@ -80,7 +80,8 @@ describe the expected integration order, not a reason to leave an unblocked huma
 ## 6. August definition of done
 
 - CI builds and tests without model weights and enforces the networking ban.
-- UI matches `landing.png` and `translation.png`, excluding prototype features cut by the spec.
+- UI matches the task-mapped approved images in `docs/design/august-ui/` and the canonical
+  behavior in `docs/design/UI-SPEC.md`.
 - Mocks exercise every state and error path without loading ML models.
 - A human installs the model-enabled build on a supported iPhone and tests in airplane mode.
 - Typed and voice turns work in both directions for smoke-test inputs.

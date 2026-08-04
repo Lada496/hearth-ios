@@ -1,9 +1,14 @@
 # Hearth UI Specification
 
-**Purpose:** make the SwiftUI app visually indistinguishable from the prototype. Every value
-below was extracted from the prototype's actual CSS (paths given), not approximated. When in
-doubt, the screenshots in `screenshots/` are the final arbiter — especially `translation.png`
-(conversation screen) and `landing.png`.
+**Purpose:** define the canonical visual contract for the SwiftUI app. The values were extracted
+from the original prototype once and are now frozen here; upstream prototype changes do not
+change Hearth automatically. For approved August screens and task-specific flows, use the
+repository-backed source of truth in [`august-ui/`](august-ui/).
+
+The older full-prototype images in `screenshots/` are historical provenance. They include
+features Hearth cut, including the Support tab, model-region picker, transcript persistence,
+and harmful-language alert. Never implement those images beyond the scope explicitly retained
+by this specification, the PRD, and the current sprint task.
 
 **August 2026 scope note:** the final language list and permanent tier badges are deferred.
 Where this historical visual spec says Tier 1/Tier 2, implement the equivalent runtime state:
@@ -16,7 +21,7 @@ Implement all tokens in `Hearth/DesignSystem/` (e.g. `Color+Hearth.swift`,
 
 ## 1. Color tokens
 
-Source: `reference/frontend/app/globals.css`
+These values are canonical; change them only through an approved design-spec update.
 
 | Token | Hex | Usage |
 |---|---|---|
@@ -43,30 +48,31 @@ Source: `reference/frontend/app/globals.css`
 
 The prototype's contrast pairs are **WCAG AAA** — preserve them exactly.
 
-**Grain texture:** the whole app has a fractal-noise overlay at 3.5% opacity
-(`globals.css` body::after). SwiftUI: a tiled noise image in an `.overlay` with
+**Grain texture:** the whole app has a fractal-noise overlay at 3.5% opacity. SwiftUI: a tiled noise image in an `.overlay` with
 `.opacity(0.035)` and `.allowsHitTesting(false)` at the root. Low priority but it is part of
 the warm paper-like feel.
 
 ## 2. Typography
 
-| Role | Font | Size / weight | Source |
-|---|---|---|---|
-| App body / UI | **Nunito** (Google Fonts, OFL — bundle the TTFs) | 13–15 pt, weights 400/600/700/800 | `globals.css` |
-| Landing title "Hearth" | **Playfair Display** 900 | 80 pt, letter-spacing −1, line-height 1 | `app/page.module.css` |
-| Landing subtitle | Playfair Display 700 | 17 pt | same |
-| CTA button | Nunito 800 | 17 pt | same |
-| Conversation: latest translation | Nunito 700 | 24 pt, line-height 1.4, centered | `ConversationThread.module.css` |
-| Conversation: language badge | Nunito 700 | 22 pt, color `headingInk` | same |
-| Bubble translation | Nunito 700 | 15 pt, line-height 1.35 | `MessageBubble.module.css` |
-| Bubble original (source text) | Nunito italic | 12 pt, line-height 1.4 | same |
-| Tab labels | Nunito 700 | 13 pt | `translate-page.module.css` |
-| Text input | Nunito 400 | 13 pt | `TextInputBar.module.css` |
+| Role | Font | Size / weight |
+|---|---|---|
+| App body / UI | **Nunito** (Google Fonts, OFL — bundle the TTFs) | 13–15 pt, weights 400/600/700/800 |
+| Landing title "Hearth" | **Playfair Display** 900 | 80 pt, letter-spacing −1, line-height 1 |
+| Landing subtitle | Playfair Display 700 | 17 pt |
+| CTA button | Nunito 800 | 17 pt |
+| Conversation: latest translation | Nunito 700 | 24 pt, line-height 1.4, centered |
+| Conversation: language badge | Nunito 700 | 22 pt, color `headingInk` |
+| Bubble translation | Nunito 700 | 15 pt, line-height 1.35 |
+| Bubble original (source text) | Nunito italic | 12 pt, line-height 1.4 |
+| Tab labels | Nunito 700 | 13 pt |
+| Text input | Nunito 400 | 13 pt |
 
 Both fonts are SIL OFL — bundling in an iOS app is permitted; add them to the attribution
 screen. Worker-side text must additionally support Dynamic Type scaling (PRD §6).
 
-## 3. Screen: Landing  (`screenshots/landing.png`, `reference/frontend/app/page.tsx`)
+## 3. Screen: Landing
+
+Approved image: [`august-ui/prototype-01-landing.png`](august-ui/prototype-01-landing.png).
 
 - Full-screen `sideTop` background, vertically centered VStack, gap 20.
 - "Hearth" Playfair 900 80 pt `headingInk` → subtitle "Real-time translation, face to face"
@@ -74,7 +80,11 @@ screen. Worker-side text must additionally support Dynamic Type scaling (PRD §6
 - CTA: warmth bg, `textOnWarmth` label, padding 16×48, **fully rounded** (radius 100),
   press scales to 0.98. Tap → 200 ms fade → conversation screen.
 
-## 4. Screen: Conversation  (`screenshots/translation.png`, `reference/frontend/app/translate-page.tsx`)
+## 4. Screen: Conversation
+
+Approved images: [`august-ui/prototype-02-conversation-empty.png`](august-ui/prototype-02-conversation-empty.png)
+through [`august-ui/prototype-07-recoverable-error.png`](august-ui/prototype-07-recoverable-error.png),
+plus [`august-ui/flow-02-conversation-turn.png`](august-ui/flow-02-conversation-turn.png).
 
 The signature screen. Vertical layout, full height:
 
@@ -96,15 +106,14 @@ The signature screen. Vertical layout, full height:
 - Shell: max-width 420 pt centered (matters on iPad), `cream` background, content clipped.
 - The two panes are **equal flex halves**. Each shows the conversation *from its viewer's
   perspective* (own messages right-aligned warmth bubbles, other's left-aligned).
-- Prototype center-stage display: the *latest* message is shown large (24 pt centered) in
-  each pane with a 22 pt language badge (flag + name) above — see `ConversationThread.tsx`.
-  Follow the screenshot.
+- The *latest* message is shown large (24 pt centered) in each pane with a 22 pt language badge
+  (flag + name) above. Follow the approved images.
 - Error toast: floats top-center (top ≈ 80), `errorBg` bg, white 13 pt semibold, radius 12,
   max-width 300, slides down 8 pt + fades in over 0.3 s, tap to dismiss.
 - Talk/Support tab pill (top-right in prototype): **cut for v1** (no Support tab). Keep the
   visual pattern in mind for v2.
 
-### 4a. MicButton  (`reference/frontend/components/MicButton.module.css`)
+### 4a. MicButton
 
 - 60×60 circle, `warmth` bg, `textOnWarmth` mic glyph, shadow: warmth-tinted
   `rgba(240,168,130,0.35)` y=3 blur=14.
@@ -115,7 +124,7 @@ The signature screen. Vertical layout, full height:
 - Disabled (other side recording / processing): opacity 0.25, hit-testing off.
 - Positioned bottom-center of its pane, slightly overlapping the thread above.
 
-### 4b. Message bubbles  (`reference/frontend/components/MessageBubble.module.css`)
+### 4b. Message bubbles
 
 - Max-width 88% of pane, padding 10×14, radius 16 — except the corner nearest the sender is 4
   ("me": bottom-right 4; "other": bottom-left 4).
@@ -127,12 +136,12 @@ The signature screen. Vertical layout, full height:
   replace it with a small "text only" label.
 - Entry animation: fade + 6 pt upward slide, 0.3 s ease.
 
-### 4c. Processing indicator  (`ConversationThread.module.css`)
+### 4c. Processing indicator
 
 Three 10 pt dots, `processing` color, scale 1→1.3→1 + opacity 0.3→1→0.3, 1 s loop,
 staggered 0 / 0.15 / 0.3 s. Centered in the pane while transcribing/translating.
 
-### 4d. TextInputBar  (`reference/frontend/components/TextInputBar.module.css`)
+### 4d. TextInputBar
 
 - Collapsed: a lone 48×48 pencil icon button, left-aligned (margin-left 24), muted `#8A827D`.
 - Tap → card slides open ~0.45 s spring-ish ease (cubic-bezier(0.16,1,0.3,1)); icon shrinks
@@ -145,14 +154,10 @@ staggered 0 / 0.15 / 0.3 s. Centered in the pane while transcribing/translating.
 
 ### 4e. Language sheet (deferred until target languages are selected)
 
-After the target-language decision, use
-`reference/frontend/components/SupportPanel.tsx:17-40` as a visual/data reference, filter it
-to the approved catalog, and add the approved capability labels. Rows: flag emoji + name,
-Nunito 600, cream surface, warmth highlight on selection. Present as a standard `.sheet` from
-the center divider.
-
-Do not implement this for the August build. Until the final catalog exists, the divider may
-display detected session-language metadata but must not advertise a supported-language list.
+Do not implement this for the August build. After humans select target languages, write and
+approve a dedicated spec for the sheet instead of inheriting the prototype's language catalog.
+Until then, the divider may display detected session-language metadata but must not advertise a
+supported-language list.
 
 ## 5. Motion summary
 
@@ -174,15 +179,14 @@ display detected session-language metadata but must not advertise a supported-la
   `sand.opacity(...)`; match against screenshots, not exact CSS alpha.
 - `100dvh` → SwiftUI handles this natively; respect safe areas; keyboard avoidance only on
   the bottom (worker) input — the top input needs custom handling since it's rotated.
-- Flag emoji render natively. Preview/test fixtures may borrow the prototype's
-  `LANGUAGE_FLAGS` map, but production views must accept runtime language metadata rather than
-  reading a fixed catalog.
+- Flag emoji render natively. Preview/test fixtures may use `Domain/TestFixtures.swift`, but
+  production views must accept runtime language metadata rather than reading a fixed catalog.
 - Radius-100 pills → `Capsule()`.
 - Verify colors on-device: prototype colors are sRGB; use `Color(red:green:blue:)` from hex
   in sRGB space.
 
 ## 7. Acceptance: "did we replicate it?"
 
-Side-by-side review (simulator screenshot vs `screenshots/translation.png` and
-`landing.png`) at each UI PR. Pass = a teammate cannot tell which is which at arm's length,
-minus cut features (tab pill, region picker, transcript buttons).
+Side-by-side review against the task-mapped images in `docs/design/august-ui/` at each UI PR.
+Pass = a teammate cannot tell the implementation from the approved retained screen at arm's
+length. Historical full-prototype screenshots are not acceptance targets.
