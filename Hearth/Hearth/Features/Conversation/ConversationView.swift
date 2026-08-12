@@ -6,7 +6,7 @@ import SwiftUI
 /// content, mic input, and text input are supplied by the caller so this view has no
 /// engine or ViewModel dependency (those land in #25/#26/#27/#31).
 struct ConversationView<TopContent: View, BottomContent: View>: View {
-    let residentLanguageName: String
+    let residentLanguageName: String?
     let workerLanguageName: String
     @ViewBuilder let topContent: () -> TopContent
     @ViewBuilder let bottomContent: () -> BottomContent
@@ -58,16 +58,22 @@ private struct ConversationPaneView<Content: View>: View {
 /// Apple's colorful emoji presentation by default, which reads as out of place against the
 /// app's warm, understated tone.
 private struct CenterDividerView: View {
-    let residentLanguageName: String
+    let residentLanguageName: String?
     let workerLanguageName: String
 
     var body: some View {
-        HStack(spacing: 8) {
-            Text(workerLanguageName)
-            Image(systemName: "arrow.left.and.right")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.Hearth.headingInk.opacity(0.5))
-            Text(residentLanguageName)
+        Group {
+            if let residentLanguageName {
+                HStack(spacing: 8) {
+                    Text(workerLanguageName)
+                    Image(systemName: "arrow.left.and.right")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(Color.Hearth.headingInk.opacity(0.5))
+                    Text(residentLanguageName)
+                }
+            } else {
+                Text("Language detected after first turn")
+            }
         }
         .font(FontHearth.bodySemibold)
         .foregroundStyle(Color.Hearth.headingInk)
@@ -103,5 +109,16 @@ private struct CenterDividerView: View {
                 .padding()
             Spacer()
         }
+    }
+}
+
+#Preview("Conversation shell — resident language not yet detected") {
+    ConversationView(
+        residentLanguageName: nil,
+        workerLanguageName: TestFixtures.FixtureLanguage.english.displayName
+    ) {
+        Color.clear
+    } bottomContent: {
+        Color.clear
     }
 }
