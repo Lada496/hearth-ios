@@ -1,8 +1,7 @@
 import Foundation
 
 /// One conversation turn: what was said, by whom, in which languages, and when.
-/// Ports `TranslationResult` from `reference/frontend/types.ts`, trimmed to what the
-/// language-neutral UI and ViewModel need.
+/// Contains only what the language-neutral UI and ViewModel need.
 ///
 /// In-memory only — never persisted (ADR-006). `hasPlayableAudio` is UI-only metadata set
 /// after a TTS engine successfully synthesizes audio for this message; it is not audio data

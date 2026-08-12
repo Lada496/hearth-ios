@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Color tokens ported from the prototype's `globals.css` (UI-SPEC.md §1).
+/// Canonical color tokens from `docs/design/UI-SPEC.md` §1.
 /// Views must reference these tokens and never hard-code hex values.
 extension Color {
     enum Hearth {

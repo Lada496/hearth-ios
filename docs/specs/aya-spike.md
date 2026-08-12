@@ -163,7 +163,7 @@ Do not commit model files to this repo.
 
 ## Implementation Prompt
 
-Port the prototype translation prompt and output cleanup behavior into `TinyAyaEngine`.
+This section is the canonical prompt and output-cleanup contract for `TinyAyaEngine`.
 
 Prompt:
 
@@ -175,11 +175,11 @@ You are a translator. Output ONLY the {target_lang} translation of the text belo
 
 Cleanup:
 
-- Strip leading labels such as `Translation:`, `Answer:`, `Text:`, `Output:`, `Result:`, and
-  `{target_lang}:`.
+- Trim surrounding whitespace.
+- Strip the first matching leading label case-insensitively: `{target_lang} translation:`,
+  `{target_lang}:`, `Translation:`, `Answer:`, `Text:`, `Translated text:`, `Output:`, or
+  `Result:`. Trim again after removing the label.
 - If the model returns alternatives separated by `" or "`, use the first alternative.
-
-Source: `reference/backend/main.py`
 
 ## ADR Impact
 

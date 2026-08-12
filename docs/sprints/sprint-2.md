@@ -22,8 +22,9 @@ Implement collapsed/expanded input, multiline limit, send/disabled behavior, and
 keyboard handling. It emits text only.
 
 ### 2.5 — Conversation ViewModel · Owner A/B · agent-safe · [#9](https://github.com/Lada496/hearth-ios/issues/9)
-Port the reference state machine against mocks. Preserve concurrency guards, empty-input
-behavior, readable errors, session language metadata, and idle recovery with unit tests.
+Implement the state machine in [`../specs/conversation-view-model.md`](../specs/conversation-view-model.md)
+against mocks. Preserve concurrency guards, empty-input behavior, readable errors, session
+language metadata, and idle recovery with unit tests.
 
 ### 2.6 — Bind the conversation UI to mocks · Owner B · agent-safe · [#31](https://github.com/Lada496/hearth-ios/issues/31)
 Connect the completed components to the ViewModel. Both typed and simulated mic actions must

@@ -8,8 +8,8 @@ Privacy is the product. There is no backend. There is no network code. Ever.
 1. Read `docs/PRD.md` and `docs/adr/ADRs.md`.
 2. Find your task in the current `docs/sprints/sprint-N.md` — implement exactly that scope,
    nothing more.
-3. For UI work: read `docs/design/UI-SPEC.md` and view `docs/design/screenshots/translation.png`
-   and `landing.png`. The UI must match the spec's tokens, not your taste.
+3. For UI work: read `docs/design/UI-SPEC.md` and view the task-mapped images in
+   `docs/design/august-ui/`. The UI must match the approved spec and images, not your taste.
 
 ## Hard rules (PRs violating these get closed, not fixed)
 
@@ -21,8 +21,9 @@ Privacy is the product. There is no backend. There is no network code. Ever.
    `TextToSpeech`). Changing a protocol signature requires an ADR PR approved by two humans.
 4. **No persistence of conversation content.** Messages live in memory only (ADR-006).
    `UserDefaults` is allowed only for: onboarding-seen flag, last manual language selection.
-5. **`reference/` is read-only.** It holds the React/FastAPI prototype sources as porting specs.
-   Never import from it, never edit it, never "modernize" it.
+5. **Repository specs are canonical.** The original web prototype is historical provenance,
+   not a live specification. Never sync or port an upstream change unless a human first approves
+   the corresponding change to `docs/specs/`, `docs/design/`, the PRD, or an ADR.
 6. **No force-unwraps (`!`)**, no `try!`, no `fatalError` outside precondition checks.
 7. Keep PRs ≤ ~400 changed lines. Split larger work.
 8. Every feature starts from a spec in `docs/specs/`. If the sprint task lacks detail,
@@ -67,7 +68,7 @@ Privacy is the product. There is no backend. There is no network code. Ever.
 Hearth/App/            entry point, router, device capability check
 Hearth/Features/       Landing, Onboarding, Conversation, Settings (View+ViewModel pairs)
 Hearth/Engines/        SpeechToText | Translation | TextToSpeech | Safety — protocol + impls + mocks
-Hearth/Domain/         Message, Language, SessionPhase, LanguageTier (ported from reference/frontend/types.ts)
+Hearth/Domain/         Message, Language, SessionPhase, LanguageTier
 Hearth/Audio/          AudioSessionManager (AVAudioSession lifecycle)
 Hearth/DesignSystem/   Color/Font/spacing tokens from docs/design/UI-SPEC.md
 Hearth/Resources/Models/  bundled whisper-small CoreML + tiny-aya GGUF (human-managed)

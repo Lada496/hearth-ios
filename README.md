@@ -24,7 +24,9 @@ languages, translation-quality validation, and the public release date are still
 | [`docs/adr/ADRs.md`](docs/adr/ADRs.md) | The 8 architecture decisions (guardrails for humans **and** AI agents) |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Current dependency order, team structure, schedule, and risks |
 | [`docs/backlog/model-enrichment.md`](docs/backlog/model-enrichment.md) | Post-language-selection model evaluation and enrichment order |
-| [`docs/design/UI-SPEC.md`](docs/design/UI-SPEC.md) | Exact design tokens + per-screen specs to replicate the prototype UI |
+| [`docs/design/UI-SPEC.md`](docs/design/UI-SPEC.md) | Canonical design tokens and per-screen behavior |
+| [`docs/design/august-ui/`](docs/design/august-ui/) | Approved August screens and task-mapped flows |
+| [`docs/specs/`](docs/specs/) | Canonical feature behavior and implementation contracts |
 | [`docs/sprints/`](docs/sprints/) | Sprint-by-sprint task lists with acceptance criteria |
 | [`AGENTS.md`](AGENTS.md) | Rules for ALL AI coding agents (Codex, Claude Code, Cursor) — single source of truth |
 
@@ -35,14 +37,17 @@ so both tools follow the same rules. Every implementation task should start from
 file. Standard prompt (works for either tool):
 
 > Read `AGENTS.md`, `docs/PRD.md`, `docs/adr/ADRs.md`, and `docs/sprints/sprint-N.md`.
-> For UI tasks also read `docs/design/UI-SPEC.md` and look at `docs/design/screenshots/`.
+> For UI tasks also read `docs/design/UI-SPEC.md` and the task-mapped images in
+> `docs/design/august-ui/`.
 > Implement task N.M. Do not add dependencies or change the engine protocols.
 
 Cloud agents (Codex web) usually can't run Xcode — they write code + tests and a human
 builds and device-tests before merge (see "Notes for sandboxed/cloud agents" in `AGENTS.md`).
 
-`reference/` contains the prototype source files we port from — **read-only**: agents may
-read them as specs but must never import, copy verbatim, or "fix" them.
+The [hackathon prototype](https://github.com/jasmine-pyz/youCode2026) is historical provenance,
+not a second specification. Hearth does not mirror it. Upstream changes affect this app only
+after the team intentionally updates the PRD, an ADR, or a canonical file under `docs/`.
+The original repository snapshot remains available in Git history at bootstrap commit `7436a2d`.
 
 ## Team
 

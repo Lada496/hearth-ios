@@ -1,6 +1,5 @@
-/// What the conversation is doing right now. Ports the shape of `RecordingState` from
-/// `reference/frontend/types.ts`, extended with the transcribing/translating/speaking steps
-/// that prototype didn't need to model explicitly (it called a single backend endpoint).
+/// What the conversation is doing right now. See
+/// `docs/specs/conversation-view-model.md` for the canonical transition rules.
 enum SessionPhase: Sendable, Equatable {
     /// Nothing in flight; either mic can start recording.
     case idle
