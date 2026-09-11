@@ -11,7 +11,9 @@ use fixture content in previews only.
 
 ### 2.2 — Message presentation · Owner B · agent-safe · [#25](https://github.com/Lada496/hearth-ios/issues/25)
 Implement latest-message display, message bubbles, entry motion, and speech/text capability
-indicators. Do not call a speech engine from the view.
+indicators. Do not call a speech engine from the view. The large center-stage text (UI-SPEC.md
+§4) must auto-shrink for long messages instead of clipping or overflowing its pane — plan for
+multi-line and long-text cases, not just short fixture strings.
 
 ### 2.3 — Conversation controls · Owner B · agent-safe · [#26](https://github.com/Lada496/hearth-ios/issues/26)
 Implement hold-to-record mic visuals, disabled states, pulse rings, and processing dots as

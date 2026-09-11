@@ -16,7 +16,7 @@ final class HearthTests: XCTestCase {
         XCTAssertEqual(SpacingHearth.landingContentGap, 20)
         XCTAssertEqual(SpacingHearth.ctaVerticalPadding, 16)
         XCTAssertEqual(SpacingHearth.ctaHorizontalPadding, 48)
-        XCTAssertEqual(SpacingHearth.dividerVerticalPadding, 6)
+        XCTAssertEqual(SpacingHearth.dividerVerticalPadding, 5)
         XCTAssertEqual(SpacingHearth.messageBubbleVerticalPadding, 10)
         XCTAssertEqual(SpacingHearth.messageBubbleHorizontalPadding, 14)
         XCTAssertEqual(SpacingHearth.inputHorizontalMargin, 12)

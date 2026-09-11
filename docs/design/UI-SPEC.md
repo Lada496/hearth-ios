@@ -95,7 +95,7 @@ The signature screen. Vertical layout, full height:
 │  MicButton + TextInput      │
 ├─────────────────────────────┤
 │  CENTER DIVIDER             │  glass bar: sand @55% + blur(12), 1px white@50% top/bottom
-│  (language indicator)       │  borders, vertical padding 6  [v1: shows session language;
+│  (language indicator)       │  borders, vertical padding 5  [v1: shows session language;
 ├─────────────────────────────┤   prototype had RegionPicker here — cut]
 │  BOTTOM PANE (normal)       │  bg sideBottom #FCDFC2 — worker side
 │  ConversationView (bottom)  │
@@ -104,6 +104,10 @@ The signature screen. Vertical layout, full height:
 ```
 
 - Shell: max-width 420 pt centered (matters on iPad), `cream` background, content clipped.
+- Center-divider vertical padding is 5 pt in this build — thinned from the prototype's 6 pt
+  (`translate-page.module.css`'s `.centerDivider`) per human review during issue #19; the
+  language names are shown worker-language-first (e.g. "English ↔ Kiswahili") since the
+  divider itself isn't rotated and is always read right-side-up from the worker's side.
 - The two panes are **equal flex halves**. Each shows the conversation *from its viewer's
   perspective* (own messages right-aligned warmth bubbles, other's left-aligned).
 - The *latest* message is shown large (24 pt centered) in each pane with a 22 pt language badge
