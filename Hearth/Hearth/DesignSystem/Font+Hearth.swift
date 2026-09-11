@@ -27,19 +27,19 @@ enum FontHearth {
     static let ctaButton = Font.custom(nunito, size: 17).weight(.heavy)
 
     /// Conversation: latest translation, Nunito 700, 24 pt.
-    static let latestTranslation = Font.custom(nunito, size: 24).weight(.bold)
+    static let latestTranslation = Font.custom(nunito, size: 24, relativeTo: .title2).weight(.bold)
 
     /// Conversation: language badge, Nunito 700, 22 pt.
-    static let languageBadge = Font.custom(nunito, size: 22).weight(.bold)
+    static let languageBadge = Font.custom(nunito, size: 22, relativeTo: .title3).weight(.bold)
 
     /// Message bubble translation text: Nunito 700, 15 pt.
-    static let bubbleTranslation = Font.custom(nunito, size: 15).weight(.bold)
+    static let bubbleTranslation = Font.custom(nunito, size: 15, relativeTo: .body).weight(.bold)
 
     /// Message bubble original (source) text: Nunito italic, 12 pt.
-    static let bubbleOriginal = Font.custom(nunito, size: 12).italic()
+    static let bubbleOriginal = Font.custom(nunito, size: 12, relativeTo: .footnote).italic()
 
     /// Message bubble language row: Nunito 700, 14 pt.
-    static let bubbleLanguageRow = Font.custom(nunito, size: 14).weight(.bold)
+    static let bubbleLanguageRow = Font.custom(nunito, size: 14, relativeTo: .subheadline).weight(.bold)
 
     /// Tab labels: Nunito 700, 13 pt.
     static let tabLabel = Font.custom(nunito, size: 13).weight(.bold)

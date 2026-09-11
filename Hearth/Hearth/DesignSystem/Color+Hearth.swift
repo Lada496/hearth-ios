@@ -52,6 +52,9 @@ extension Color {
         /// Translation text in "other" bubbles (AAA).
         static let bubbleOtherTranslation = Color(red: 0x3D / 255, green: 0x32 / 255, blue: 0x28 / 255)
 
+        /// Subtle background for the compact bubble playback control.
+        static let bubbleControlBackground = Color.black.opacity(0.1)
+
         /// Landing title/subtitle, conversation language badge.
         static let headingInk = Color(red: 0x5E / 255, green: 0x56 / 255, blue: 0x50 / 255)
 
